@@ -1068,7 +1068,8 @@ class SystemCheckFrame(Frame):
 				self.next_clicked()
 
 		else:
-			self.back_clicked()
+			# ~ self.back_clicked()
+			self.base_window.destroy()
 
 class NewQualitativeFrame3(Frame):
 	def __init__(self, container):
