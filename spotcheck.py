@@ -115,6 +115,7 @@ CONFIRM_BUTTON_TXT_FONT = ('Helvetica', 10)
 SAMPLE_BUTTON_TXT_FONT = ('Helvetica', 10)
 SAMPLE_LABEL_TXT_FONT = ('Helvetica', 13)
 RESULT_LABEL_TXT_FONT = ('Helvetica', 10)
+RESULT_LABEL_TXT_FONT_1 = ('Helvetica', 10, 'bold')
 PROGRAM_BUTTON_TXT_FONT = ('Helvetica', 10)
 LOGIN_LABEL_TXT_FONT = ('Helvetica', 15)
 LOGIN_BUTTON_TXT_FONT = ('Helvetica', 10)
@@ -435,7 +436,6 @@ last_checkMinute = int(fr.readline())
 last_checkSecond = int(fr.readline())
 last_checkValue = float(fr.readline())
 ##### SYSTEM CHECK HANDLE - STOP ##### 
-
 
 class ScrollableFrame(Frame):
 	def __init__(self, container, *args, **kwargs):
@@ -2616,7 +2616,7 @@ class QualitativeAnalysisFrame3(Frame):
 										width=6,
 										height=3,
 										# ~ bg = RESULT_LABEL_BGD_COLOR,
-										font = RESULT_LABEL_TXT_FONT)
+										font = RESULT_LABEL_TXT_FONT_1)
 
 				# ~ self.tooltip[i] = Pmw.Balloon(self.base_window)
 				# ~ self.tooltip[i].bind(result_label[i], self.base_window.qualitative_analysis_2.id_list[i])
@@ -2717,7 +2717,7 @@ class QualitativeAnalysisFrame3(Frame):
 
 			# In button frame
 			self.thr_value = IntVar()
-			self.thr1_radio_button = Radiobutton(self.button_frame, text = "Low", variable = self.thr_value, value=0, command=self.thr_choose)
+			self.thr1_radio_button = Radiobutton(self.button_frame, text = "Normal", variable = self.thr_value, value=0, command=self.thr_choose)
 			self.thr2_radio_button = Radiobutton(self.button_frame, text = "High", variable = self.thr_value, value=1, command=self.thr_choose)
 			
 			self.thr1_radio_button.pack(ipady=10, side=LEFT)
@@ -3244,6 +3244,11 @@ class QualitativeAnalysisFrame3(Frame):
 		self.check_result_frame = Frame(self.result_tab, bg=RESULT_TABLE_FRAME_BGD_COLOR)
 		self.check_result_frame.grid(row=0, column=0, padx=76)
 
+		try:
+			self.save_button.destroy()
+		except:
+			pass
+
 		r=0
 		c=-1
 		for i in range(0,48):
@@ -3255,7 +3260,7 @@ class QualitativeAnalysisFrame3(Frame):
 									width=6,
 									height=3,
 									# ~ bg = RESULT_LABEL_BGD_COLOR,
-									font = RESULT_LABEL_TXT_FONT)
+									font = RESULT_LABEL_TXT_FONT_1)
 
 			# ~ self.tooltip[i] = Pmw.Balloon(self.base_window)
 			# ~ self.tooltip[i].bind(result_label[i], self.base_window.qualitative_analysis_2.id_list[i])
@@ -3273,6 +3278,7 @@ class QualitativeAnalysisFrame3(Frame):
 				else:
 					self.result_label[i]['text'] = "N/A"
 					self.result_label[i]['bg'] = NA_COLOR
+				
 			else:
 				if(self.base_window.qualitative_analysis_2.id_list[i] != 'N/A'):
 					self.result_label[i]['text'] = round(self.result[i]/self.base_window.system_check.threshold,2)
@@ -3286,12 +3292,437 @@ class QualitativeAnalysisFrame3(Frame):
 				else:
 					self.result_label[i]['text'] = "N/A"
 					self.result_label[i]['bg'] = NA_COLOR
+
+				
+
 			self.result_label[i].grid(row=r,column=c, padx=1, pady=1)
 			
 		# ~ self.result_label[47]['text'] = 'B'
 		# ~ self.result_label[47]['bg'] = 'blue'
+
+		if(self.base_window.main_menu.threshold_value != self.thr_value.get()):
+			self.save_button = Button(self.button_frame,
+								text = "Save",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								width = 10,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = 'lavender',
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.save_clicked)
+			self.save_button.pack(ipady=10, side=LEFT, padx=1)
 	
 		self.base_window.update_idletasks()
+		sleep(1)
+		if(self.base_window.main_menu.threshold_value == 0 and self.thr_value.get() == 1):
+			if(os.path.exists(self.base_window.qualitative_analysis_0.result_folder_path + "/result_capture(high).jpg")):
+				pass
+			else:
+				subprocess.call(["scrot", self.base_window.qualitative_analysis_0.result_folder_path + "/result_capture(high).jpg"])
+
+		elif(self.base_window.main_menu.threshold_value == 1 and self.thr_value.get() == 0):
+			if(os.path.exists(self.base_window.qualitative_analysis_0.result_folder_path + "/result_capture(normal).jpg")):
+				pass
+			else:
+				subprocess.call(["scrot", self.base_window.qualitative_analysis_0.result_folder_path + "/result_capture(normal).jpg"])
+	
+	def save_clicked(self):
+		path = filedialog.asksaveasfilename(initialdir = self.base_window.qualitative_analysis_0.result_folder_path + '/', defaultextension='.xlsx')
+		if path is not None:
+			wb = Workbook()
+			sheet = wb.active
+
+			font0 = Font(bold=False)
+			font1 = Font(size='14', bold=True, color='00FF0000')
+			font2 = Font(bold=True)
+			thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+			# ~ sheet.protection.sheet = True
+			# ~ sheet.protection.enable()
+
+			# ~ sheet["B8"].protection = Protection(locked=False, hidden=False)
+
+			for i in range(12,60):
+				sheet["B"+str(i)].font = font0
+				sheet["D"+str(i)].font = font0
+
+			img = Img(working_dir + "/logo.png")
+			img.height = 39
+			img.width = 215
+			img.anchor = 'B2'
+			sheet.add_image(img)
+
+			if(self.base_window.main_menu.threshold_value == 0 and self.thr_value.get() == 1):
+				img = Img(self.base_window.qualitative_analysis_0.result_folder_path + "/result_capture(high).jpg")
+				img.anchor = 'H11'
+				sheet.add_image(img)
+			elif(self.base_window.main_menu.threshold_value == 1 and self.thr_value.get() == 0):
+				img = Img(self.base_window.qualitative_analysis_0.result_folder_path + "/result_capture(normal).jpg")
+				img.anchor = 'H11'
+				sheet.add_image(img)
+				
+			sheet["C10"] = self.base_window.qualitative_analysis_0.template_name
+
+			sheet.merge_cells(start_row=5, start_column=2, end_row=5, end_column=6)
+			sheet["B5"] = 'ANALYSIS RESULTS'
+			sheet["B5"].font = font1
+			sheet.cell(row=5,column=2).alignment = Alignment(horizontal='center',vertical='center',wrapText=True)
+			#global foldername
+			sheet["B7"] = 'Test name: ' + self.base_window.qualitative_analysis_0.experiment_name
+			sheet["B7"].font = font2
+			sheet['B8'] = 'Test technician name: ' + self.base_window.qualitative_analysis_0.user_name
+			sheet["B8"].font = font2
+			#global covid19dir_old
+			sheet['B9'] = 'Date: ' + self.base_window.qualitative_analysis_0.create_time
+			sheet["B9"].font = font2
+			sheet['B60'] = 'Note:'
+			sheet["B60"].font = font2
+			sheet['B61'] = '+ N/A: No sample'
+			sheet['B62'] = '+ N: Negative'
+			sheet['C61'] = '+ P_L: Low copy'
+			sheet['C62'] = '+ P_H: Positive'
+
+			sheet.merge_cells(start_row=64, start_column=4, end_row=64, end_column=6)
+			sheet.merge_cells(start_row=65, start_column=4, end_row=65, end_column=6)
+			sheet['B64'] = 'Test Technician'
+			sheet['B65'] = ''
+			sheet['D64'] = 'Head of the Laboratory'
+			sheet['D65'] = ''
+			sheet["B64"].font = font2
+			sheet["D64"].font = font2
+			sheet["B64"].protection = Protection(locked=False, hidden=False)
+			sheet["D64"].protection = Protection(locked=False, hidden=False)
+			sheet.cell(row=64,column=2).alignment = Alignment(horizontal='center',vertical='center',wrapText=True)
+			sheet.cell(row=65,column=2).alignment = Alignment(horizontal='center',vertical='center',wrapText=True)
+			sheet.cell(row=64,column=4).alignment = Alignment(horizontal='center',vertical='center',wrapText=True)
+			sheet.cell(row=65,column=4).alignment = Alignment(horizontal='center',vertical='center',wrapText=True)
+
+			for r in range(11,60):
+				for c in range(2,7):
+					sheet.cell(row=r,column=c).alignment = Alignment(horizontal='center',vertical='center',wrapText=True)
+					sheet.cell(row=r,column=c).border = thin_border
+
+			sheet.column_dimensions['B'].width = 26
+			sheet.column_dimensions['C'].width = 12
+			sheet.column_dimensions['D'].width = 12
+			sheet.column_dimensions['E'].width = 12
+			sheet.column_dimensions['F'].width = 12
+
+			sheet.row_dimensions[11].height = 40
+
+			sheet['B11'] = 'Sample name'
+			sheet["B11"].font = font2
+			sheet["B11"].fill = PatternFill(start_color='00EFEFEF', end_color='00EFEFEF', fill_type='solid')
+			sheet['C11'] = 'Sample positon'
+			sheet["C11"].font = font2
+			sheet["C11"].fill = PatternFill(start_color='00EFEFEF', end_color='00EFEFEF', fill_type='solid')
+			sheet['D11'] = 'Spotcheck Result'
+			sheet["D11"].font = font2
+			sheet["D11"].fill = PatternFill(start_color='00EFEFEF', end_color='00EFEFEF', fill_type='solid')
+			sheet['E11'] = 'Gel Result'
+			sheet["E11"].font = font2
+			sheet["E11"].fill = PatternFill(start_color='00EFEFEF', end_color='00EFEFEF', fill_type='solid')
+			sheet['F11'] = 'Final Result'
+			sheet["F11"].font = font2
+			sheet["F11"].fill = PatternFill(start_color='00EFEFEF', end_color='00EFEFEF', fill_type='solid')
+
+			for i in range (12,60):
+				if(i<20):
+					sheet['C'+str(i)] = str(chr(65+i-12)) + '1'
+				if(i>=20 and i<28):
+					sheet['C'+str(i)] = str(chr(65+i-20)) + '2'
+				if(i>=28 and i<36):
+					sheet['C'+str(i)] = str(chr(65+i-28)) + '3'
+				if(i>=36 and i<44):
+					sheet['C'+str(i)] = str(chr(65+i-36)) + '4'
+				if(i>=44 and i<52):
+					sheet['C'+str(i)] = str(chr(65+i-44)) + '5'
+				if(i>=52):
+					sheet['C'+str(i)] = str(chr(65+i-52)) + '6'
+
+			c1=-6
+			c2=-5
+			c3=-4
+			c4=-3
+			c5=-2
+			c6=-1
+			
+			if(self.thr_value.get() == 0):
+				for i in range(0,8):
+					c1=c1+6
+					sheet['B'+str(i+12)] = self.base_window.qualitative_analysis_2.id_list[c1]
+					if(self.base_window.qualitative_analysis_2.id_list[c1]=='N/A'):
+						sheet['D'+str(i+12)] = 'N/A'
+					else:
+						if(float(self.result_label[c1]['text']) <= self.base_window.main_menu.num1):
+							sheet['D'+str(i+12)] = 'N'
+							sheet['D'+str(i+12)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c1]['text']) <= self.base_window.main_menu.num3):
+								sheet['D'+str(i+12)] = 'P_L'
+								sheet['D'+str(i+12)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+								sheet['D'+str(i+12)].font = font2
+								sheet['B'+str(i+12)].font = font2
+						else:
+							sheet['D'+str(i+12)] = 'P_H'
+							sheet['D'+str(i+12)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+12)].font = font2
+							sheet['B'+str(i+12)].font = font2
+						
+					sheet['E'+str(i+12)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+12)].protection = Protection(locked=False, hidden=False)
+
+					c2=c2+6
+					sheet['B'+str(i+20)] = self.base_window.qualitative_analysis_2.id_list[c2]
+					if(self.base_window.qualitative_analysis_2.id_list[c2]=='N/A'):
+						sheet['D'+str(i+20)] = 'N/A'
+					else:
+						if(float(self.result_label[c2]['text']) <= self.base_window.main_menu.num1):
+							sheet['D'+str(i+20)] = 'N'
+							sheet['D'+str(i+20)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c2]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+20)] = 'P_L'
+							sheet['D'+str(i+20)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+20)].font = font2
+							sheet['B'+str(i+20)].font = font2
+						else:
+							sheet['D'+str(i+20)] = 'P_H'
+							sheet['D'+str(i+20)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+20)].font = font2
+							sheet['B'+str(i+20)].font = font2
+													
+					sheet['E'+str(i+20)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+20)].protection = Protection(locked=False, hidden=False)
+
+					c3=c3+6
+					sheet['B'+str(i+28)] = self.base_window.qualitative_analysis_2.id_list[c3]
+					if(self.base_window.qualitative_analysis_2.id_list[c3]=='N/A'):
+						sheet['D'+str(i+28)] = 'N/A'
+					else:
+						if(float(self.result_label[c3]['text']) <= self.base_window.main_menu.num1):
+							sheet['D'+str(i+28)] = 'N'
+							sheet['D'+str(i+28)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c3]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+28)] = 'P_L'
+							sheet['D'+str(i+28)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+28)].font = font2
+							sheet['B'+str(i+28)].font = font2
+						else:
+							sheet['D'+str(i+28)] = 'P_H'
+							sheet['D'+str(i+28)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+28)].font = font2
+							sheet['B'+str(i+28)].font = font2
+							
+					sheet['E'+str(i+28)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+28)].protection = Protection(locked=False, hidden=False)
+
+					c4=c4+6
+					sheet['B'+str(i+36)] = self.base_window.qualitative_analysis_2.id_list[c4]
+					if(self.base_window.qualitative_analysis_2.id_list[c4]=='N/A'):
+						sheet['D'+str(i+36)] = 'N/A'
+					else:
+						if(float(self.result_label[c4]['text']) <= self.base_window.main_menu.num1):
+							sheet['D'+str(i+36)] = 'N'
+							sheet['D'+str(i+36)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c4]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+36)] = 'P_L'
+							sheet['D'+str(i+36)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+36)].font = font2
+							sheet['B'+str(i+36)].font = font2
+						else:
+							sheet['D'+str(i+36)] = 'P_H'
+							sheet['D'+str(i+36)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+36)].font = font2
+							sheet['B'+str(i+36)].font = font2
+					
+					sheet['E'+str(i+36)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+36)].protection = Protection(locked=False, hidden=False)
+
+					c5=c5+6
+					sheet['B'+str(i+44)] = self.base_window.qualitative_analysis_2.id_list[c5]
+					if(self.base_window.qualitative_analysis_2.id_list[c5]=='N/A'):
+						sheet['D'+str(i+44)] = 'N/A'
+					else:
+						if(float(self.result_label[c5]['text']) <= self.base_window.main_menu.num1):
+							sheet['D'+str(i+44)] = 'N'
+							sheet['D'+str(i+44)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c5]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+44)] = 'P_L'
+							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+44)].font = font2
+							sheet['B'+str(i+4)].font = font2
+						else:
+							sheet['D'+str(i+44)] = 'P_H'
+							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+44)].font = font2
+							sheet['B'+str(i+44)].font = font2
+
+					sheet['E'+str(i+44)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+44)].protection = Protection(locked=False, hidden=False)
+
+					c6=c6+6
+					sheet['B'+str(i+52)] = self.base_window.qualitative_analysis_2.id_list[c6]
+					if(self.base_window.qualitative_analysis_2.id_list[c6]=='N/A'):
+						sheet['D'+str(i+52)] = 'N/A'
+					else:
+						if(self.result_label[c6]['text'] != 'B'):
+							if(float(self.result_label[c6]['text']) <= self.base_window.main_menu.num1):
+								sheet['D'+str(i+52)] = 'N'
+								sheet['D'+str(i+52)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+							elif(float(self.result_label[c6]['text']) <= self.base_window.main_menu.num3):
+								sheet['D'+str(i+52)] = 'P_L'
+								sheet['D'+str(i+52)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+								sheet['D'+str(i+52)].font = font2
+								sheet['B'+str(i+52)].font = font2
+							else:
+								sheet['D'+str(i+52)] = 'P_H'
+								sheet['D'+str(i+52)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+								sheet['D'+str(i+52)].font = font2
+								sheet['B'+str(i+52)].font = font2
+					
+					sheet['E'+str(i+52)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+52)].protection = Protection(locked=False, hidden=False)
+			
+			else: # if(self.base_window.main_menu.threshold_value == 1)
+				for i in range(0,8):
+					c1=c1+6
+					sheet['B'+str(i+12)] = self.base_window.qualitative_analysis_2.id_list[c1]
+					if(self.base_window.qualitative_analysis_2.id_list[c1]=='N/A'):
+						sheet['D'+str(i+12)] = 'N/A'
+					else:
+						if(float(self.result_label[c1]['text']) <= self.base_window.main_menu.num2):
+							sheet['D'+str(i+12)] = 'N'
+							sheet['D'+str(i+12)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c1]['text']) <= self.base_window.main_menu.num3):
+								sheet['D'+str(i+12)] = 'P_L'
+								sheet['D'+str(i+12)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+								sheet['D'+str(i+12)].font = font2
+								sheet['B'+str(i+12)].font = font2
+						else:
+							sheet['D'+str(i+12)] = 'P_H'
+							sheet['D'+str(i+12)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+12)].font = font2
+							sheet['B'+str(i+12)].font = font2
+						
+					sheet['E'+str(i+12)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+12)].protection = Protection(locked=False, hidden=False)
+
+					c2=c2+6
+					sheet['B'+str(i+20)] = self.base_window.qualitative_analysis_2.id_list[c2]
+					if(self.base_window.qualitative_analysis_2.id_list[c2]=='N/A'):
+						sheet['D'+str(i+20)] = 'N/A'
+					else:
+						if(float(self.result_label[c2]['text']) <= self.base_window.main_menu.num2):
+							sheet['D'+str(i+20)] = 'N'
+							sheet['D'+str(i+20)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c2]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+20)] = 'P_L'
+							sheet['D'+str(i+20)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+20)].font = font2
+							sheet['B'+str(i+20)].font = font2
+						else:
+							sheet['D'+str(i+20)] = 'P_H'
+							sheet['D'+str(i+20)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+20)].font = font2
+							sheet['B'+str(i+20)].font = font2
+													
+					sheet['E'+str(i+20)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+20)].protection = Protection(locked=False, hidden=False)
+
+					c3=c3+6
+					sheet['B'+str(i+28)] = self.base_window.qualitative_analysis_2.id_list[c3]
+					if(self.base_window.qualitative_analysis_2.id_list[c3]=='N/A'):
+						sheet['D'+str(i+28)] = 'N/A'
+					else:
+						if(float(self.result_label[c3]['text']) <= self.base_window.main_menu.num2):
+							sheet['D'+str(i+28)] = 'N'
+							sheet['D'+str(i+28)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c3]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+28)] = 'P_L'
+							sheet['D'+str(i+28)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+28)].font = font2
+							sheet['B'+str(i+28)].font = font2
+						else:
+							sheet['D'+str(i+28)] = 'P_H'
+							sheet['D'+str(i+28)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+28)].font = font2
+							sheet['B'+str(i+28)].font = font2
+							
+					sheet['E'+str(i+28)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+28)].protection = Protection(locked=False, hidden=False)
+
+					c4=c4+6
+					sheet['B'+str(i+36)] = self.base_window.qualitative_analysis_2.id_list[c4]
+					if(self.base_window.qualitative_analysis_2.id_list[c4]=='N/A'):
+						sheet['D'+str(i+36)] = 'N/A'
+					else:
+						if(float(self.result_label[c4]['text']) <= self.base_window.main_menu.num2):
+							sheet['D'+str(i+36)] = 'N'
+							sheet['D'+str(i+36)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c4]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+36)] = 'P_L'
+							sheet['D'+str(i+36)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+36)].font = font2
+							sheet['B'+str(i+36)].font = font2
+						else:
+							sheet['D'+str(i+36)] = 'P_H'
+							sheet['D'+str(i+36)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+36)].font = font2
+							sheet['B'+str(i+36)].font = font2
+					
+					sheet['E'+str(i+36)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+36)].protection = Protection(locked=False, hidden=False)
+
+					c5=c5+6
+					sheet['B'+str(i+44)] = self.base_window.qualitative_analysis_2.id_list[c5]
+					if(self.base_window.qualitative_analysis_2.id_list[c5]=='N/A'):
+						sheet['D'+str(i+44)] = 'N/A'
+					else:
+						if(float(self.result_label[c5]['text']) <= self.base_window.main_menu.num2):
+							sheet['D'+str(i+44)] = 'N'
+							sheet['D'+str(i+44)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+						elif(float(self.result_label[c5]['text']) <= self.base_window.main_menu.num3):
+							sheet['D'+str(i+44)] = 'P_L'
+							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+							sheet['D'+str(i+44)].font = font2
+							sheet['B'+str(i+4)].font = font2
+						else:
+							sheet['D'+str(i+44)] = 'P_H'
+							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+							sheet['D'+str(i+44)].font = font2
+							sheet['B'+str(i+44)].font = font2
+
+					sheet['E'+str(i+44)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+44)].protection = Protection(locked=False, hidden=False)
+
+					c6=c6+6
+					sheet['B'+str(i+52)] = self.base_window.qualitative_analysis_2.id_list[c6]
+					if(self.base_window.qualitative_analysis_2.id_list[c6]=='N/A'):
+						sheet['D'+str(i+52)] = 'N/A'
+					else:
+						if(self.result_label[c6]['text'] != 'B'):
+							if(float(self.result_label[c6]['text']) <= self.base_window.main_menu.num2):
+								sheet['D'+str(i+52)] = 'N'
+								sheet['D'+str(i+52)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+							elif(float(self.result_label[c6]['text']) <= self.base_window.main_menu.num3):
+								sheet['D'+str(i+52)] = 'P_L'
+								sheet['D'+str(i+52)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+								sheet['D'+str(i+52)].font = font2
+								sheet['B'+str(i+52)].font = font2
+							else:
+								sheet['D'+str(i+52)] = 'P_H'
+								sheet['D'+str(i+52)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+								sheet['D'+str(i+52)].font = font2
+								sheet['B'+str(i+52)].font = font2
+						
+					sheet['E'+str(i+52)].protection = Protection(locked=False, hidden=False)
+					sheet['F'+str(i+52)].protection = Protection(locked=False, hidden=False)
+			
+			# ~ sheet['D59'] = 'B'
+			# ~ sheet['D'+str(i+52)].fill = PatternFill(start_color='FFFFFFFF', end_color='FFFFFFFF', fill_type='solid')
+			sheet.print_area = 'A1:G70'
+			# ~ wb.save(self.base_window.qualitative_analysis_1.analysis_result_folder + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsm')
+			wb.save(path)
+			messagebox.showinfo("","File saved successfully")
 				
 	def thr_choose(self):
 		print("thr_value = ", self.thr_value.get()) 
@@ -3946,6 +4377,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 
 			sheet.print_area = 'A1:G70'
 			wb.save(self.base_window.quantitative_analysis_1.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name['text'] + '.xlsx')
+
 
 			if(os.path.exists(id_path + self.base_window.quantitative_analysis_2.id_file_name_label['text'] + '.xlsx')):
 				try:
@@ -5315,12 +5747,12 @@ class IDCreateFrame(Frame):
 					
 			
 			if(self.direct_create == 1):
-				wb.save(id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsm')
+				wb.save(id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsx')
 				msg = messagebox.askquestion("","File has been created.\n Do you want to go back to the previous step?")
 				if(msg=="yes"):
 					file_name = self.base_window.qualitative_analysis_0.experiment_name
 					file_create_done = 1
-					self.base_window.qualitative_analysis_2.id_file_path = id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsm'
+					self.base_window.qualitative_analysis_2.id_file_path = id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsx'
 			# ~ elif(self.direct_create == 1):
 				# ~ wb.save(id_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsm')
 				# ~ msg = messagebox.askquestion("","File has been created.\n Do you want to go back to the previous step?")
@@ -5328,7 +5760,7 @@ class IDCreateFrame(Frame):
 					# ~ file_name = self.base_window.quantitative_analysis_0.experiment_name
 					# ~ file_create_done = 1
 			else:
-				path = filedialog.asksaveasfilename(initialdir = id_path + '/', defaultextension='.xlsm')
+				path = filedialog.asksaveasfilename(initialdir = id_path + '/', defaultextension='.xlsx')
 				if path is not None:
 					tmp = 0
 					for i in range(len(path)):
@@ -5348,7 +5780,7 @@ class IDCreateFrame(Frame):
 					self.back_clicked()
 				elif(self.direct_create==1): #create file with create module from qualitative_analysis_2
 					
-					wb = load_workbook(id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsm')
+					wb = load_workbook(id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsx')
 					sheet = wb.active					
 					self.base_window.qualitative_analysis_2.id_list[0] = sheet["B12"].value
 					self.base_window.qualitative_analysis_2.id_list[1] = sheet["B20"].value
@@ -6407,7 +6839,7 @@ class ViewResultFrame(Frame):
 		result_button_list = list(range(49))
 		position_button_list = list(range(49))
 
-		self.path = filedialog.askopenfilename(initialdir=results_path, filetypes=[('Excel file','.xlsm')])
+		self.path = filedialog.askopenfilename(initialdir=results_path, filetypes=[('Excel file','.xlsx')])
 		if self.path is not None:
 			try:
 				self.infor_frame.destroy()
@@ -7065,7 +7497,7 @@ class MainMenu(Frame):
 
 		
 		self.thr1_button = Button(self.threshold_label_frame,
-					text = "Low",
+					text = "Normal",
 					font = SWITCH_PAGE_BUTTON_FONT,
 					bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
 					fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
