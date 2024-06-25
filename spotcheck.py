@@ -1020,7 +1020,7 @@ class SystemCheckFrame(Frame):
 				self.average_current_intensity < average_base_intensity - average_base_intensity*30/100):
 					for i in range(0,48):
 						result_label[i]['bg'] = RESULT_LABEL_ERROR_BGD_COLOR
-					self.err = 2
+					self.err = 0
 			
 			# Save time and value check
 			now = datetime.now()
@@ -2717,7 +2717,7 @@ class QualitativeAnalysisFrame3(Frame):
 
 			# In button frame
 			self.thr_value = IntVar()
-			self.thr1_radio_button = Radiobutton(self.button_frame, text = "Normal", variable = self.thr_value, value=0, command=self.thr_choose)
+			self.thr1_radio_button = Radiobutton(self.button_frame, text = "Standard", variable = self.thr_value, value=0, command=self.thr_choose)
 			self.thr2_radio_button = Radiobutton(self.button_frame, text = "High", variable = self.thr_value, value=1, command=self.thr_choose)
 			
 			self.thr1_radio_button.pack(ipady=10, side=LEFT)
@@ -7497,7 +7497,7 @@ class MainMenu(Frame):
 
 		
 		self.thr1_button = Button(self.threshold_label_frame,
-					text = "Normal",
+					text = "Standard",
 					font = SWITCH_PAGE_BUTTON_FONT,
 					bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
 					fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
