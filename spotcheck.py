@@ -1020,7 +1020,7 @@ class SystemCheckFrame(Frame):
 				self.average_current_intensity < average_base_intensity - average_base_intensity*30/100):
 					for i in range(0,48):
 						result_label[i]['bg'] = RESULT_LABEL_ERROR_BGD_COLOR
-					self.err = 0
+					self.err = 2
 			
 			# Save time and value check
 			now = datetime.now()
