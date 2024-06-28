@@ -103,6 +103,9 @@ NEGATIVE_COLOR = "green3"
 POSITIVE_COLOR = "red"
 LOW_COPY_COLOR = "pink"
 
+QS_FIRSTWELL_COLOR = "tomato1"
+QS_LASTWELL_COLOR = "deep sky blue"
+
 MAIN_MENU_BUTTON_FONT = ('Helvetica', 10, 'bold')
 LABELFRAME_TXT_FONT = ('Helvetica', 12)
 MAIN_FUCNTION_BUTTON_FONT = ('Helvetica', 10)
@@ -1020,7 +1023,7 @@ class SystemCheckFrame(Frame):
 				self.average_current_intensity < average_base_intensity - average_base_intensity*30/100):
 					for i in range(0,48):
 						result_label[i]['bg'] = RESULT_LABEL_ERROR_BGD_COLOR
-					self.err = 2
+					self.err = 0
 			
 			# Save time and value check
 			now = datetime.now()
@@ -5386,6 +5389,7 @@ class IDCreateFrame(Frame):
 		self.well_button_table_frame = Frame(self.work_frame, bg=SAMPLE_BUTTON_FRAME_BDG_COLOR)
 		self.well_button_table_frame.pack(side=LEFT)
 		self.well_button = list(range(48))
+		self.well_frame = list(range(48))
 		r=-1
 		c=0
 		for i in range(0,48):
@@ -5393,7 +5397,8 @@ class IDCreateFrame(Frame):
 			if(r>7):
 				r=0
 				c+=1
-			self.well_button[i] = Button(self.well_button_table_frame,
+			self.well_frame[i] = Frame(self.well_button_table_frame, highlightbackground = SAMPLE_BUTTON_BGD_COLOR,  highlightthickness = 2, bd=0)
+			self.well_button[i] = Button(self.well_frame[i],
 										bg = SAMPLE_BUTTON_BGD_COLOR,
 										fg = SAMPLE_BUTTON_TXT_COLOR,
 										activebackground = SAMPLE_BUTTON_ACTIVE_BGD_COLOR,
@@ -5404,11 +5409,14 @@ class IDCreateFrame(Frame):
 										height = SAMPLE_BUTTON_HEIGHT)
 			# ~ if(i!=47):
 			self.well_button[i]['command'] = partial(self.well_button_clicked, i)
-			self.well_button[i].grid(row=r, column=c, padx=2, pady=2)
+			self.well_frame[i].grid(row=r, column=c, padx=1, pady=1)
+			self.well_button[i].pack()
 		
 		# ~ self.well_button[47]['bg'] = "blue"
 		# ~ self.well_button[47]['text'] = "B"
 		# ~ self.well_button[47]['state'] = "disabled"
+		self.well_frame[0]['highlightbackground'] = QS_FIRSTWELL_COLOR
+		self.well_frame[47]['highlightbackground'] = QS_LASTWELL_COLOR
 		
 		# Properties frame
 		self.property_frame = Frame(self.work_frame, bg=SAMPLE_BUTTON_FRAME_BDG_COLOR, width=495)
@@ -5472,14 +5480,14 @@ class IDCreateFrame(Frame):
 		
 		self.first_well_label = Label(self.qc1_frame,
 						text = "A1",
-						bg = SAMPLE_BUTTON_CHOOSE_BGD_COLOR,
+						bg = QS_FIRSTWELL_COLOR,
 						fg = LABEL_TXT_COLOR,
 						font = SAMPLE_LABEL_TXT_FONT)
 		self.first_well_label.grid(row=1, column=0)
 		
 		self.last_well_label = Label(self.qc1_frame,
 						text = "H6",
-						bg = SAMPLE_BUTTON_CHOOSE_BGD_COLOR,
+						bg = QS_LASTWELL_COLOR,
 						fg = LABEL_TXT_COLOR,
 						font = SAMPLE_LABEL_TXT_FONT)
 		self.last_well_label.grid(row=1, column=1)
@@ -5629,12 +5637,20 @@ class IDCreateFrame(Frame):
 		if(n>=40):
 			self.well_name_label['text'] = str(chr(65+n-40)) + '6'
 		
-		if(self.first_well_button['bg'] == 'lawn green'):
+		if(self.first_well_button['bg'] == 'lawn green' and self.well_frame[n]['highlightbackground'] != QS_LASTWELL_COLOR):
 			self.first_well_label['text'] = self.well_name_label['text']
 			self.first_well_index = n
-		else:
+			for i in range(0,48):
+				if(self.well_frame[i]['highlightbackground'] != QS_LASTWELL_COLOR):
+					self.well_frame[i]['highlightbackground'] = SAMPLE_BUTTON_BGD_COLOR
+			self.well_frame[n]['highlightbackground'] = QS_FIRSTWELL_COLOR
+		elif(self.first_well_button['bg'] != 'lawn green' and self.well_frame[n]['highlightbackground'] != QS_FIRSTWELL_COLOR):
 			self.last_well_label['text'] = self.well_name_label['text']
 			self.last_well_index = n
+			for i in range(0,48):
+				if(self.well_frame[i]['highlightbackground'] != QS_FIRSTWELL_COLOR):
+					self.well_frame[i]['highlightbackground'] = SAMPLE_BUTTON_BGD_COLOR
+			self.well_frame[n]['highlightbackground'] = QS_LASTWELL_COLOR
 			
 		self.ok_button = Button(self.property_labelframe,
 								text = "OK",
@@ -5951,10 +5967,12 @@ class IDCreateFrame(Frame):
 		except:
 			pass
 
+		# In work frame
 		# Sample button frame
 		self.well_button_table_frame = Frame(self.work_frame, bg=SAMPLE_BUTTON_FRAME_BDG_COLOR)
 		self.well_button_table_frame.pack(side=LEFT)
 		self.well_button = list(range(48))
+		self.well_frame = list(range(48))
 		r=-1
 		c=0
 		for i in range(0,48):
@@ -5962,7 +5980,8 @@ class IDCreateFrame(Frame):
 			if(r>7):
 				r=0
 				c+=1
-			self.well_button[i] = Button(self.well_button_table_frame,
+			self.well_frame[i] = Frame(self.well_button_table_frame, highlightbackground = SAMPLE_BUTTON_BGD_COLOR,  highlightthickness = 2, bd=0)
+			self.well_button[i] = Button(self.well_frame[i],
 										bg = SAMPLE_BUTTON_BGD_COLOR,
 										fg = SAMPLE_BUTTON_TXT_COLOR,
 										activebackground = SAMPLE_BUTTON_ACTIVE_BGD_COLOR,
@@ -5973,11 +5992,14 @@ class IDCreateFrame(Frame):
 										height = SAMPLE_BUTTON_HEIGHT)
 			# ~ if(i!=47):
 			self.well_button[i]['command'] = partial(self.well_button_clicked, i)
-			self.well_button[i].grid(row=r, column=c, padx=2, pady=2)
+			self.well_frame[i].grid(row=r, column=c, padx=1, pady=1)
+			self.well_button[i].pack()
 		
 		# ~ self.well_button[47]['bg'] = "blue"
 		# ~ self.well_button[47]['text'] = "B"
 		# ~ self.well_button[47]['state'] = "disabled"
+		self.well_frame[0]['highlightbackground'] = QS_FIRSTWELL_COLOR
+		self.well_frame[47]['highlightbackground'] = QS_LASTWELL_COLOR
 		
 		# Properties frame
 		self.property_frame = Frame(self.work_frame, bg=SAMPLE_BUTTON_FRAME_BDG_COLOR, width=495)
@@ -6000,7 +6022,7 @@ class IDCreateFrame(Frame):
 						fg = LABEL_TXT_COLOR,
 						font = SAMPLE_LABEL_TXT_FONT)
 		self.well_name_label.grid(row=0, column=0, columnspan=2, sticky=EW)
-
+		
 		#quick create frame
 		self.quick_create_frame = Frame(self.work_frame, bg=SAMPLE_BUTTON_FRAME_BDG_COLOR)
 		self.quick_create_frame.pack(fill=BOTH, expand=TRUE, side=LEFT)
@@ -6041,14 +6063,14 @@ class IDCreateFrame(Frame):
 		
 		self.first_well_label = Label(self.qc1_frame,
 						text = "A1",
-						bg = SAMPLE_BUTTON_CHOOSE_BGD_COLOR,
+						bg = QS_FIRSTWELL_COLOR,
 						fg = LABEL_TXT_COLOR,
 						font = SAMPLE_LABEL_TXT_FONT)
 		self.first_well_label.grid(row=1, column=0)
 		
 		self.last_well_label = Label(self.qc1_frame,
 						text = "H6",
-						bg = SAMPLE_BUTTON_CHOOSE_BGD_COLOR,
+						bg = QS_LASTWELL_COLOR,
 						fg = LABEL_TXT_COLOR,
 						font = SAMPLE_LABEL_TXT_FONT)
 		self.last_well_label.grid(row=1, column=1)
@@ -7651,6 +7673,8 @@ class MainMenu(Frame):
 			pass
 		
 		self.base_window.forget_page()
+		self.base_window.id_create.first_well_index = 0
+		self.base_window.id_create.last_well_index = 47
 		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.id_create)
 		self.base_window.switch_page()
 
