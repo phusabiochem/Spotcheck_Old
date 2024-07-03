@@ -440,6 +440,21 @@ last_checkSecond = int(fr.readline())
 last_checkValue = float(fr.readline())
 ##### SYSTEM CHECK HANDLE - STOP ##### 
 
+##### OLD INFO HANDLE - START #####
+if not os.path.exists('/home/pi/Spotcheck/.oldinfo.txt'):
+	fw_info = open('/home/pi/Spotcheck/.oldinfo.txt', 'x')
+	fw_info.writelines('@gmail.com\n')
+	fw_info.writelines('user\n')
+	fw_info.close()
+	autofill_email = "@gmail.com"
+	autofill_user = "user"
+else:
+	fr_info = open('/home/pi/Spotcheck/.oldinfo.txt')
+	autofill_email = fr_info.readline().strip('\n')
+	autofill_user = fr_info.readline().strip('\n')
+##### OLD INFO HANDLE - STOP #####
+
+
 class ScrollableFrame(Frame):
 	def __init__(self, container, *args, **kwargs):
 		super().__init__(container, *args, **kwargs)
@@ -4559,15 +4574,17 @@ class QualitativeAnalysisFrame2(Frame):
 				msg = messagebox.askquestion("", "Do you want the device to automatically email the results ?")
 				if(msg=='yes'):
 					self.email_label_frame = LabelFrame(self.work_frame,
-														width = 100,
-														height = 50,
+														width = 200,
+														height = 100,
 														text = "Recipient email",
-														bg = 'dodger blue')
+														bg = 'grey75')
 					self.email_label_frame.place(x=200, y=150)
 
 					self.email_entry = Entry(self.email_label_frame, width=30, justify='right', font=('Courier',14))
-					self.email_entry.pack()
-
+					self.email_entry.pack(padx=10, pady=10)
+					
+					self.email_entry.insert(0, autofill_email.strip('\n'))
+					
 					self.ok_button = Button(self.email_label_frame,
 								text = "OK",
 								font = SWITCH_PAGE_BUTTON_FONT,
@@ -4577,7 +4594,7 @@ class QualitativeAnalysisFrame2(Frame):
 								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
 								borderwidth = 0,
 								command = self.ok_clicked)
-					self.ok_button.pack(side=LEFT, padx=20, pady=2, ipady=10, ipadx=20)
+					self.ok_button.pack(side=LEFT, padx=20, pady=10, ipady=10, ipadx=20)
 
 					self.cancel_button = Button(self.email_label_frame,
 								text = "Cancel",
@@ -4588,7 +4605,7 @@ class QualitativeAnalysisFrame2(Frame):
 								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
 								borderwidth = 0,
 								command = self.cancel_clicked)
-					self.cancel_button.pack(side=RIGHT, padx=20, pady=2, ipady=10, ipadx=20)
+					self.cancel_button.pack(side=RIGHT, padx=20, pady=10, ipady=10, ipadx=20)
 
 				else:
 					self.automail_is_on = 0
@@ -4612,12 +4629,23 @@ class QualitativeAnalysisFrame2(Frame):
 			# ~ if (match == None):
 				# ~ messagebox.showerror("","Email syntax error")
 			# ~ else:
+			
+			global autofill_email
+			autofill_email = addressToVerify
+			fw_info = open('/home/pi/Spotcheck/.oldinfo.txt', 'w')
+			fw_info.writelines(addressToVerify + '\n')
+			fw_info.writelines(autofill_user + '\n')
+			fw_info.close()
+			
 			self.recipient_email = addressToVerify
 			self.automail_is_on = 1
 			self.base_window.forget_page()
 			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_3)
 			self.base_window.switch_page()
 			self.base_window.qualitative_analysis_3.serial_handle()
+			
+			
+	
 
 	def cancel_clicked(self):
 		self.email_label_frame.place_forget()
@@ -5260,6 +5288,13 @@ class QualitativeAnalysisFrame0(Frame):
 		self.user_name_entry.grid(row=1, column=2, sticky=W, pady=20, padx=20)
 		self.template_name_entry = Entry(setup_labelframe, width=30, font=ENTRY_TXT_FONT)
 		self.template_name_entry.grid(row=2, column=2, sticky=W, pady=20, padx=20)
+		
+		global autofill_email, autofill_user
+		fr_info = open('/home/pi/Spotcheck/.oldinfo.txt')
+		autofill_email = fr_info.readline()
+		autofill_user = fr_info.readline().strip('\n')
+		
+		self.user_name_entry.insert(0, autofill_user)
 
 		# In button frame
 		self.back_button = Button(self.button_frame,
@@ -5295,42 +5330,54 @@ class QualitativeAnalysisFrame0(Frame):
 		self.experiment_name = self.experiment_name_entry.get()
 		self.user_name = self.user_name_entry.get()
 		self.template_name = self.template_name_entry.get()
-		if(self.experiment_name==''):
-			messagebox.showwarning("","Plese enter Folder Name !")
-		elif (self.user_name==''):
-			messagebox.showwarning("","Plese enter User Name !")
-		elif(self.template_name == ''):
-			messagebox.showwarning("","Plese enter Template Name !")
+		# ~ if(self.experiment_name==''):
+			# ~ messagebox.showwarning("","Plese enter Folder Name !")
+		# ~ elif (self.user_name==''):
+			# ~ messagebox.showwarning("","Plese enter User Name !")
+		# ~ elif(self.template_name == ''):
+			# ~ messagebox.showwarning("","Plese enter Template Name !")
+		# ~ else:
+		
+		global autofill_email, autofill_user
+		autofill_user = self.user_name
+		fw_info = open('/home/pi/Spotcheck/.oldinfo.txt', 'w')
+		fw_info.writelines(autofill_email + '\n')
+		fw_info.writelines(self.user_name + '\n')
+		fw_info.close()
+		
+		### NEW ADD - START ###
+		self.create_time = strftime("%y-%m-%d")
+		self.result_folder_name_0 = self.create_time
+		self.create_time_1 = strftime("%Hh%Mm%Ss")
+		
+		if not os.path.exists(results_path + self.result_folder_name_0):
+			 self.result_folder_path_0  = os.path.join(results_path , self.result_folder_name_0)
+			 os.mkdir(self.result_folder_path_0)
 		else:
-
-			### NEW ADD - START ###
-			self.create_time = strftime("%y-%m-%d") 
-			self.result_folder_name_0 = self.create_time
-			
-			if not os.path.exists(results_path + self.result_folder_name_0):
-				 self.result_folder_path_0  = os.path.join(results_path , self.result_folder_name_0)
-				 os.mkdir(self.result_folder_path_0)
-			else:
-				self.result_folder_path_0 = results_path +  self.result_folder_name_0
-				
+			self.result_folder_path_0 = results_path +  self.result_folder_name_0
+		
+		if(self.experiment_name != ''):
 			self.result_folder_name = self.experiment_name
-			self.result_folder_path = os.path.join(self.result_folder_path_0, self.result_folder_name)
-			os.mkdir(self.result_folder_path)
-			print(self.result_folder_path)
-			
-			self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
-			os.mkdir(self.system_check_folder)
+		else:
+			self.result_folder_name = self.create_time_1
+			self.experiment_name = self.create_time_1
+		self.result_folder_path = os.path.join(self.result_folder_path_0, self.result_folder_name)
+		os.mkdir(self.result_folder_path)
+		print(self.result_folder_path)
+		
+		self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
+		os.mkdir(self.system_check_folder)
 
-			self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
-			os.mkdir(self.analysis_result_folder)
-			
-			# ~ self.base_window.system_check.mode_check = 1
-			### NEW ADD - END ###
-			
-			self.base_window.forget_page()
-			#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
-			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_2)
-			self.base_window.switch_page()
+		self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
+		os.mkdir(self.analysis_result_folder)
+		
+		# ~ self.base_window.system_check.mode_check = 1
+		### NEW ADD - END ###
+		
+		self.base_window.forget_page()
+		#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
+		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_2)
+		self.base_window.switch_page()
 
 
 class QuantitativeAnalysisFrame0(QualitativeAnalysisFrame0):
