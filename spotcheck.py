@@ -2693,7 +2693,6 @@ class QualitativeAnalysisFrame3(Frame):
 			na_copy_text_label.grid(row=3, column=1, padx=20, pady=10)
 			
 
-			
 			# images tab
 			img_labelframe_1 = LabelFrame(image_tab,
 										bg="black",
@@ -2779,7 +2778,6 @@ class QualitativeAnalysisFrame3(Frame):
 			# else:
 			wb = Workbook()
 			sheet = wb.active
-
 
 			font0 = Font(bold=False)
 			font1 = Font(size='14', bold=True, color='00FF0000')
@@ -2993,7 +2991,7 @@ class QualitativeAnalysisFrame3(Frame):
 							sheet['D'+str(i+44)] = 'P_L'
 							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
 							sheet['D'+str(i+44)].font = font2
-							sheet['B'+str(i+4)].font = font2
+							sheet['B'+str(i+44)].font = font2
 						else:
 							sheet['D'+str(i+44)] = 'P_H'
 							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
@@ -3128,7 +3126,7 @@ class QualitativeAnalysisFrame3(Frame):
 							sheet['D'+str(i+44)] = 'P_L'
 							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
 							sheet['D'+str(i+44)].font = font2
-							sheet['B'+str(i+4)].font = font2
+							sheet['B'+str(i+44)].font = font2
 						else:
 							sheet['D'+str(i+44)] = 'P_H'
 							sheet['D'+str(i+44)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
@@ -5291,7 +5289,7 @@ class QualitativeAnalysisFrame0(Frame):
 		
 		global autofill_email, autofill_user
 		fr_info = open('/home/pi/Spotcheck/.oldinfo.txt')
-		autofill_email = fr_info.readline()
+		autofill_email = fr_info.readline().strip('\n')
 		autofill_user = fr_info.readline().strip('\n')
 		
 		self.user_name_entry.insert(0, autofill_user)
