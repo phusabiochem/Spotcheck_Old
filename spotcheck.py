@@ -39,6 +39,9 @@ import re
 import dns.resolver
 import socket
 
+import board
+import adafruit_ds1307
+import time
 
 APP_BGD_COLOR = "white smoke"
 # MAIN MENU DEFINE
@@ -155,6 +158,10 @@ ser = serial.Serial(
 	bytesize = serial.EIGHTBITS,
 	timeout = 1
 )
+
+# DS1307
+i2c = board.I2C()
+rtc = adafruit_ds1307.DS1307(i2c)
 
 ##### GLOBAL VARIABLE - END #####
 
@@ -453,6 +460,30 @@ else:
 	autofill_email = fr_info.readline().strip('\n')
 	autofill_user = fr_info.readline().strip('\n')
 ##### OLD INFO HANDLE - STOP #####
+
+##### ACTIVE CODE HANDLE - START #####
+try:
+	fr = open(working_dir + "/active_code.txt","r")
+	active_code = fr.readline().strip('\n')
+except:
+	active_code = '0'
+##### ACTIVE CODE HANDLE - END #####
+
+##### TRIAL EXPIRED HANDLE - START #####
+try:
+	fr = open("/var/tmp/.trial_info.txt","r")
+	trial_date = int(fr.readline())
+	trial_month = int(fr.readline())
+	trial_year = int(fr.readline())
+	trial_30days_extend_code = fr.readline().strip('\n')
+	trial_full_active_code = fr.readline().strip('\n')
+except:
+	trial_date = 0
+	trial_month = 0
+	trial_year = 0
+	trial_30days_extend_code = ''
+	trial_full_active_code = ''
+##### TRIAL EXPIRED HANDLE - END #####
 
 
 class ScrollableFrame(Frame):
@@ -7421,8 +7452,6 @@ class SettingFrame(Frame):
 		self.title_label.pack(expand=TRUE)
 		
 		# In work frame
-		
-		
 		self.calibration_button = Button(self.work_frame,
 									text = "Calibration",
 									font = MAIN_FUCNTION_BUTTON_FONT,
@@ -7453,6 +7482,83 @@ class SettingFrame(Frame):
 								# ~ command = self.back_clicked)
 		self.back_button.pack(side=LEFT, padx=0, pady=0, ipady=10, ipadx=30, anchor=W)
 
+class TrialExpiredFrame(Frame):
+	def __init__(self, master):
+		super().__init__(master)
+		self.base_window = master
+
+		# ~ self.title_frame = Frame(self, bg = TITILE_FRAME_BGD_COLOR)
+		# ~ self.title_frame.pack(ipadx=0, ipady=5, fill=X)
+		self.work_frame = Frame(self, bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.work_frame.pack(expand=TRUE)
+		self.work_frame.pack_propagate(0)
+		# ~ self.button_frame = Frame(self, bg = MAIN_MENU_BUTTON_FRAME_BGD_COLOR)
+		# ~ self.button_frame.pack(fill=X, expand=TRUE)
+		
+		# In title frame
+		# ~ self.title_label = Label(self.title_frame,
+								# ~ text = "...",
+								# ~ font = TITLE_TXT_FONT,
+								# ~ bg = TITILE_FRAME_BGD_COLOR,
+								# ~ fg = TITILE_FRAME_TXT_COLOR)
+		# ~ self.title_label.pack(padx=0, pady=0, ipady=10, ipadx=30)
+		
+		# In work frame
+		print("self.base_window.trial_days: ", self.base_window.trial_days)
+		self.expire_info1_label = Label(self.work_frame,
+								text = "Your " + str(self.base_window.trial_days) + "-day trial has expired",
+								font = ('Courier',15),
+								bg = LABEL_FRAME_BGD_COLOR,
+								fg = 'red')
+		self.expire_info1_label.grid(row=0, column=0, pady=30, sticky=EW)
+		
+		self.expire_info2_label = Label(self.work_frame,
+								text = " Please enter the activation code to continue using the application",
+								font = TITLE_TXT_FONT,
+								bg = LABEL_FRAME_BGD_COLOR,
+								fg = 'grey35')
+		self.expire_info2_label.grid(row=2, column=0, pady=10, padx=30, sticky=W)
+		
+		self.active_code_entry = Entry(self.work_frame, width=30, font=('Courier',14))
+		self.active_code_entry.grid(row=3, column=0, pady=10, padx=30, sticky=EW)
+		
+		self.activate_button = Button(self.work_frame,
+								text = "Activate",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								# width = SWITCH_PAGE_BUTTON_WIDTH,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.activate_clicked)
+		self.activate_button.grid(row=4, column=0, ipady=10, pady=30, padx=150, sticky=EW)
+	
+	def activate_clicked(self):
+		self.active_code_enter = self.active_code_entry.get()
+		if(self.active_code_enter != ''):
+			if(self.active_code_enter == trial_30days_extend_code):
+				if(active_code != trial_30days_extend_code):
+					fw = open(working_dir + "/active_code.txt",'w')	
+					fw.writelines(self.active_code_enter + '\n')
+					messagebox.showinfo("","Your trial package has been extended to 30 days.")
+					self.base_window.forget_page()
+					self.base_window.page_num = self.base_window.frame_list.index(self.base_window.main_menu)
+					self.base_window.switch_page()
+					self.base_window.system_check_light()
+				else:
+					messagebox.showerror("","Your code is invalid, please try again.")
+			elif(self.active_code_enter == trial_full_active_code):
+				fw = open(working_dir + "/active_code.txt",'w')	
+				fw.writelines(self.active_code_enter + '\n')
+				messagebox.showinfo("","Successful activation.")
+				self.base_window.forget_page()
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.main_menu)
+				self.base_window.switch_page()
+				self.base_window.system_check_light()
+			else:
+				messagebox.showerror("","Your code is invalid, please try again.")
+		else:
+			messagebox.showwarning("","Please enter activation code.")
 
 class MainMenu(Frame):
 	def __init__(self, master):
@@ -7836,6 +7942,7 @@ class MainWindow(Tk):
 
 		self.page_num = 0
 		self.frame_list = []
+		self.trial_days = 0
 
 		self.main_menu = MainMenu(self)
 		self.qualitative_option = QualitativeOptionFrame(self)
@@ -7867,6 +7974,7 @@ class MainWindow(Tk):
 		self.quantitative_analysis_0 = QuantitativeAnalysisFrame0(self)
 		self.connect = ConnectFrame(self)
 		self.setting = SettingFrame(self)
+		self.trial_expried = TrialExpiredFrame(self)
 
 		self.frame_list.append(self.main_menu)
 		self.frame_list.append(self.qualitative_option)
@@ -7898,9 +8006,16 @@ class MainWindow(Tk):
 		self.frame_list.append(self.quantitative_analysis_0)
 		self.frame_list.append(self.connect)
 		self.frame_list.append(self.setting) 
+		self.frame_list.append(self.trial_expried)
 
 		self.switch_page()
-		self.system_check_light()
+		if(active_code == trial_full_active_code):
+			self.system_check_light()
+		elif(active_code == trial_30days_extend_code):
+			self.trial_30days_extend()
+		else:
+			self.trial_7days()
+			
 
 	def forget_page(self):
 		self.frame_list[self.page_num].forget()
@@ -7939,6 +8054,47 @@ class MainWindow(Tk):
 		self.switch_page()
 		self.update_idletasks()
 		self.system_check.serial_handle()
+	
+	def trial_30days_extend(self):
+		self.dt = rtc.datetime
+		self.recent_date = self.dt.tm_mday
+		self.recent_month = self.dt.tm_mon
+		self.recent_year = self.dt.tm_year
+		
+		time1 = trial_year*365 + trial_month*30 + trial_date
+		time2 = self.recent_year*365 + self.recent_month*30 + self.recent_date
+		number_of_days = time2 - time1
+		print("Trial days left: ", 30 - number_of_days, '/30')
+		
+		if(number_of_days > 30):
+			self.trial_days = 30
+			self.forget_page()
+			self.page_num = self.frame_list.index(self.trial_expried)
+			self.switch_page()
+			self.update_idletasks()
+		else:
+			self.system_check_light()
+			
+	def trial_7days(self):
+		self.dt = rtc.datetime
+		self.recent_date = self.dt.tm_mday
+		self.recent_month = self.dt.tm_mon
+		self.recent_year = self.dt.tm_year
+		
+		time1 = trial_year*365 + trial_month*30 + trial_date
+		time2 = self.recent_year*365 + self.recent_month*30 + self.recent_date
+		number_of_days = time2 - time1
+		print("Trial days left: ", 7 - number_of_days, '/7')
+		
+		if(number_of_days > 7):
+			self.trial_days = 7
+			self.forget_page()
+			self.page_num = self.frame_list.index(self.trial_expried)
+			self.switch_page()
+			self.update_idletasks()
+		else:
+			self.system_check_light()
+		
 	
 if __name__ == "__main__":
 	app = MainWindow()
