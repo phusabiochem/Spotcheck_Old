@@ -196,11 +196,11 @@ parent_dir = '/home/pi'
 print("working_dir: ", working_dir)
 print("parent_dir: ", parent_dir)
 ##### In Spotcheck folder - Start #####
-# Programs path
-# ~ if not os.path.exists(working_dir + "/Programs"):
-	# ~ f = os.path.join(working_dir + '/', "Programs")
-	# ~ os.mkdir(f)
-# ~ programs_path = working_dir + "/Programs/"
+# ~ # Programs path
+if not os.path.exists(working_dir + "/Programs"):
+	f = os.path.join(working_dir + '/', "Programs")
+	os.mkdir(f)
+programs_path = working_dir + "/Programs/"
 
 # ~ # Programs qualitaitve
 # ~ if not os.path.exists(programs_path + "Screening"):
@@ -208,11 +208,11 @@ print("parent_dir: ", parent_dir)
 	# ~ os.mkdir(f)
 # ~ programs_qualitative_path = programs_path + "Screening/"
 
-# ~ # Programs quantitaitve
-# ~ if not os.path.exists(programs_path + "/Quantitative"):
-	# ~ f = os.path.join(programs_path + '/', "Quantitative")
-	# ~ os.mkdir(f)
-# ~ programs_quantitative_path = programs_path + "Quantitative/"
+# Programs quantitaitve
+if not os.path.exists(programs_path + "/Quantitative"):
+	f = os.path.join(programs_path + '/', "Quantitative")
+	os.mkdir(f)
+programs_quantitative_path = programs_path + "Quantitative/"
 ##### In Spotcheck folder - End #####
 
 ##### At Desktop - Start #####
@@ -222,17 +222,17 @@ if not os.path.exists(parent_dir + "/Desktop/Spotcheck_Results"):
 	os.mkdir(f)
 results_path = parent_dir + "/Desktop/Spotcheck_Results/"
 
-# Spotcheck results qualitative path
-# ~ if not os.path.exists(results_path + "Screening"):
-	# ~ f = os.path.join(results_path, "Screening")
-	# ~ os.mkdir(f)
-# ~ results_qualitative_path = results_path + "Screening/"
+# ~ # Spotcheck results qualitative path
+if not os.path.exists(results_path + "Screening"):
+	f = os.path.join(results_path, "Screening")
+	os.mkdir(f)
+results_qualitative_path = results_path + "Screening/"
 
-# Spotcheck results quantitative path
-# ~ if not os.path.exists(results_path + "Quantitative"):
-	# ~ f = os.path.join(results_path, "Quantitative")
-	# ~ os.mkdir(f)
-# ~ results_quantitative_path = results_path + "Quantitative/"
+# ~ # Spotcheck results quantitative path
+if not os.path.exists(results_path + "Quantitative"):
+	f = os.path.join(results_path, "Quantitative")
+	os.mkdir(f)
+results_quantitative_path = results_path + "Quantitative/"
 
 # Programs results path
 if not os.path.exists(parent_dir + "/Desktop/Spotcheck_Programs"):
@@ -466,7 +466,7 @@ try:
 	fr = open(working_dir + "/active_code.txt","r")
 	active_code = fr.readline().strip('\n')
 except:
-	active_code = '0'
+	active_code = 'phusa@full'
 ##### ACTIVE CODE HANDLE - END #####
 
 ##### TRIAL EXPIRED HANDLE - START #####
@@ -481,8 +481,8 @@ except:
 	trial_date = 0
 	trial_month = 0
 	trial_year = 0
-	trial_30days_extend_code = ''
-	trial_full_active_code = ''
+	trial_30days_extend_code = 'phusa@30'
+	trial_full_active_code = 'phusa@full'
 ##### TRIAL EXPIRED HANDLE - END #####
 
 
@@ -754,8 +754,8 @@ class SystemCheckFrame(Frame):
 		self.err = 0
 		self.mode_check = 0 # 0 --> first check when open app -> back to main menu if check ok
 							# 1 --> check when start analysis -> back to qualitative analysis 0 if check ok
-							# 2 --> create quantitative program
-							# 3 --> analysis quantitative program
+							# 2 --> check when start analysis -> back to quantitative analysis 0 if check ok
+							
 
 		# 3 main frame
 		self.title_frame = Frame(self, bg = TITILE_FRAME_BGD_COLOR)
@@ -818,9 +818,7 @@ class SystemCheckFrame(Frame):
 			#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
 			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_0)
 		elif(self.mode_check == 2):
-			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.new_quantitative_1)
-		elif(self.mode_check == 3):
-			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_1)
+			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_0)
 		self.base_window.switch_page()
 
 	def next_clicked(self):
@@ -840,11 +838,7 @@ class SystemCheckFrame(Frame):
 				self.base_window.switch_page()
 			elif(self.mode_check == 2):
 				self.base_window.forget_page()
-				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.new_quantitative_2)
-				self.base_window.switch_page()
-			elif(self.mode_check == 3):
-				self.base_window.forget_page()
-				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_2)
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_0)
 				self.base_window.switch_page()
 
 	def serial_handle(self):
@@ -942,11 +936,10 @@ class SystemCheckFrame(Frame):
 				#cv2.imwrite(self.base_window.qualitative_analysis_1.system_check_folder + '/system_check_process.jpg', self.image)
 				cv2.imwrite(system_check_path + 'system_check_process.jpg', self.image)
 			elif(self.mode_check==2):
-				self.result, self.image = Process_Image(results_programs_quantitative_path + self.base_window.new_quantitative_1.experiment_name + '/system_check_raw.jpg').process(coefficient)
-				cv2.imwrite(results_programs_quantitative_path + self.base_window.new_quantitative_1.experiment_name + '/system_check_process.jpg', self.image)
-			elif(self.mode_check==3):
-				self.result, self.image = Process_Image(self.base_window.quantitative_analysis_1.system_check_folder + '/system_check_raw.jpg').process(coefficient)
-				cv2.imwrite(self.base_window.quantitative_analysis_1.system_check_folder + '/system_check_process.jpg', self.image)
+				#self.result, self.image = Process_Image(self.base_window.qualitative_analysis_1.system_check_folder + '/system_check_raw.jpg').process(coefficient)
+				self.result, self.image = Process_Image(system_check_path + 'system_check_raw.jpg').process(coefficient)
+				#cv2.imwrite(self.base_window.qualitative_analysis_1.system_check_folder + '/system_check_process.jpg', self.image)
+				cv2.imwrite(system_check_path + 'system_check_process.jpg', self.image)
 
 			self.progressbar['value']=80
 			self.base_window.update_idletasks()
@@ -1069,7 +1062,7 @@ class SystemCheckFrame(Frame):
 				self.average_current_intensity < average_base_intensity - average_base_intensity*30/100):
 					for i in range(0,48):
 						result_label[i]['bg'] = RESULT_LABEL_ERROR_BGD_COLOR
-					self.err = 0
+					self.err = 2
 			
 			# Save time and value check
 			now = datetime.now()
@@ -2418,10 +2411,82 @@ class NewQualitativeFrame1(Frame):
 					self.base_window.system_check.serial_handle()
 
 
-class NewQuantitativeFrame1(NewQualitativeFrame1):
+class NewQuantitativeFrame1(Frame):
 	def __init__(self, container):
 		super().__init__(container)
-		self.title_label['text'] = "CALIBRATION"
+
+		self['bg'] = MAIN_FUNCTION_FRAME_BGD_COLOR
+		self.base_window = container
+
+		self.experiment_name = StringVar()
+		self.user_name = StringVar()
+		self.comments = StringVar()
+
+		# 3 main frame
+		self.title_frame = Frame(self, bg = TITILE_FRAME_BGD_COLOR)
+		self.title_frame.pack(ipadx=0, ipady=5, fill=X)
+		self.work_frame = Frame(self, bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.work_frame.pack(expand=TRUE)
+		self.button_frame = Frame(self, bg = MAIN_MENU_BUTTON_FRAME_BGD_COLOR)
+		self.button_frame.pack(fill=X)
+
+		# In title frame
+		self.title_label = Label(self.title_frame,
+								text = "KITS MANAGEMENT",
+								font = TITLE_TXT_FONT,
+								bg = TITILE_FRAME_BGD_COLOR,
+								fg = TITILE_FRAME_TXT_COLOR)
+		self.title_label.pack(expand=TRUE)
+
+		# In work frame
+		setup_labelframe = LabelFrame(self.work_frame,
+									text = "Properties",
+									font = LABEL_FRAME_TXT_FONT,
+									bg = LABEL_FRAME_BGD_COLOR,
+									fg = LABEL_FRAME_TXT_COLOR)
+		setup_labelframe.pack(expand=TRUE)
+
+		experiment_name_label = Label(setup_labelframe,
+									text = "Kit Name",
+									font = LABEL_TXT_FONT,
+									bg = LABEL_BGD_COLOR,
+									fg = LABEL_TXT_COLOR)
+		experiment_name_label.grid(row=0, column=1, sticky=E, pady=20, padx=30)
+
+		info_label = Label(setup_labelframe,
+								text = "Information",
+								font = LABEL_TXT_FONT,
+								bg = LABEL_BGD_COLOR,
+								fg = LABEL_TXT_COLOR)
+		info_label.grid(row=1, column=1, sticky=NE, pady=20, padx=30)
+
+		self.experiment_name_entry = Entry(setup_labelframe, width=30, font=ENTRY_TXT_FONT)
+		self.experiment_name_entry.grid(row=0, column=2, sticky=W, pady=20, padx=35)
+		self.properties_text = Text(setup_labelframe, width=30, height=9, font=ENTRY_TXT_FONT)
+		self.properties_text.grid(row=1, column=2, sticky=E, pady=20, padx=35)
+
+		# In button frame
+		self.back_button = Button(self.button_frame,
+								text = "Back",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								# width = SWITCH_PAGE_BUTTON_WIDTH,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.back_clicked)
+		self.back_button.pack(ipadx=30, ipady=10, side=LEFT)
+
+		self.next_button = Button(self.button_frame,
+								text = "Next",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								# width = SWITCH_PAGE_BUTTON_WIDTH,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.next_clicked)
+		self.next_button.pack(ipadx=30, ipady=10, side=RIGHT)
 
 	def back_clicked(self):
 		self.base_window.forget_page()
@@ -3868,7 +3933,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 			self.progressbar['value']=45
 			self.base_window.update_idletasks()
 			try:
-				camera_capture(self.base_window.quantitative_analysis_1.analysis_result_folder + '/raw.jpg')
+				camera_capture(self.base_window.quantitative_analysis_0.analysis_result_folder + '/raw.jpg')
 
 				self.progressbar['value']=65
 				self.base_window.update_idletasks()
@@ -3879,7 +3944,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(msg=='ok'):
 					self.base_window.destroy()
 
-			self.result, self.image = Process_Image(self.base_window.quantitative_analysis_1.analysis_result_folder + '/raw.jpg').process(coefficient, mode=1, well_list=self.base_window.quantitative_analysis_2.id_list)
+			self.result, self.image = Process_Image(self.base_window.quantitative_analysis_0.analysis_result_folder + '/raw.jpg').process(coefficient, mode=1, well_list=self.base_window.quantitative_analysis_2.id_list)
 
 			self.x_result_list = list(range(48))
 			self.y_result_list = list(range(48))
@@ -3888,13 +3953,14 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[i] != 'N/A'):
 					self.y_result_list[i] = self.result[i]/self.base_window.system_check.threshold
 					self.x_result_list[i] = (self.y_result_list[i] - self.base_window.quantitative_analysis_1.b_value)/self.base_window.quantitative_analysis_1.a_value
-					self.concen_result_list[i] = round((1 + (self.x_result_list[i] - round(self.x_result_list[i])))*(10**round(self.x_result_list[i])))
-
+					self.concen_result_list[i] = round(10**self.x_result_list[i])
+					# ~ self.concen_result_list[i] = round((1 + (self.x_result_list[i] - round(self.x_result_list[i])))*(10**round(self.x_result_list[i])))
+					# ~ self.concen_result_list[i] = self.x_result_list[i]
 			self.progressbar['value']=80
-			self.base_window.update_idletasks()
+			self.base_window.update_idletasks() 
 			sleep(0.5)
 
-			cv2.imwrite(self.base_window.quantitative_analysis_1.analysis_result_folder + '/process.jpg', self.image)
+			cv2.imwrite(self.base_window.quantitative_analysis_0.analysis_result_folder + '/process.jpg', self.image)
 
 			sum_value = 0
 			active_well_number = 0
@@ -3940,7 +4006,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				else:
 					sheet[pos] = "N/A"
 
-			wb.save(self.base_window.quantitative_analysis_1.analysis_result_folder + "/analysis_value.xlsx")
+			wb.save(self.base_window.quantitative_analysis_0.analysis_result_folder + "/analysis_value.xlsx")
 			wb.close()
 
 			self.progressbar['value']=95
@@ -3979,7 +4045,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 					c=0
 					r+=1
 				result_label[i] = Label(self.check_result_frame,
-										width=12,
+										width=18,
 										height=3,
 										# ~ bg = RESULT_LABEL_BGD_COLOR,
 										font = RESULT_LABEL_TXT_FONT)
@@ -3988,119 +4054,48 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				# ~ self.tooltip[i].bind(result_label[i], self.base_window.quantitative_analysis_2.id_list[i])
 
 				if(self.base_window.quantitative_analysis_2.id_list[i] != 'N/A'):
-					if(round(self.result[i]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[i]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						result_label[i]['bg'] = NEGATIVE_COLOR
 						result_label[i]['text'] = '0'
-					elif(self.concen_result_list[i] <= 100):
+					elif(self.concen_result_list[i] < 100):
 						result_label[i]['bg'] = LOW_COPY_COLOR
-						result_label[i]['text'] = self.concen_result_list[i]
-					elif(self.concen_result_list[i] > 100):
-						result_label[i]['bg'] = POSITIVE_COLOR
-						result_label[i]['text'] = self.concen_result_list[i]
+						result_label[i]['text'] = '< 100'
+					elif(self.concen_result_list[i] <= 1000):
+						result_label[i]['bg'] = LOW_COPY_COLOR
+						result_label[i]['text'] = "100 - 1000"
+					elif(self.concen_result_list[i] <= 5000):
+						result_label[i]['bg'] = LOW_COPY_COLOR
+						result_label[i]['text'] = "1001 - 5000"
+					else:
+						result_label[i]['bg'] = LOW_COPY_COLOR
+						result_label[i]['text'] = "> 5000"
 				else:
 					result_label[i]['text'] = "N/A"
 					result_label[i]['bg'] = NA_COLOR
 				result_label[i].grid(row=r,column=c, padx=1, pady=1)
 
-			self.annotate_result_frame = Frame(result_tab, bg=MAIN_FUNCTION_FRAME_BGD_COLOR)
-			self.annotate_result_frame.grid(row=0, column=1, padx=2)
+			# ~ self.annotate_result_frame = Frame(result_tab, bg=MAIN_FUNCTION_FRAME_BGD_COLOR)
+			# ~ self.annotate_result_frame.grid(row=0, column=1, padx=2)
 
-			nagative_label = Label(self.annotate_result_frame, bg=NEGATIVE_COLOR, width=4, height=2)
-			nagative_label.grid(row=0, column=0, padx=20, pady=10)
-			nagative_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="NEGATIVE (N)", height=2)
-			nagative_text_label.grid(row=0, column=1, padx=20, pady=10)
-			low_copy_label = Label(self.annotate_result_frame, bg=LOW_COPY_COLOR, width=4, height=2)
-			low_copy_label.grid(row=1, column=0, padx=20, pady=10)
-			low_copy_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="LOW COPY (P_L)", height=2)
-			low_copy_text_label.grid(row=1, column=1, padx=20, pady=10)
-			positive_label = Label(self.annotate_result_frame, bg=POSITIVE_COLOR, width=4, height=2)
-			positive_label.grid(row=2, column=0, padx=20, pady=10)
-			positive_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="POSITIVE (P_H)", height=2)
-			positive_text_label.grid(row=2, column=1, padx=20, pady=10)
-			na_label = Label(self.annotate_result_frame, bg=NA_COLOR, width=4, height=2)
-			na_label.grid(row=3, column=0, padx=20, pady=10)
-			na_copy_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="NO SAMPLE (N/A)", height=2)
-			na_copy_text_label.grid(row=3, column=1, padx=20, pady=10)
+			# ~ nagative_label = Label(self.annotate_result_frame, bg=NEGATIVE_COLOR, width=4, height=2)
+			# ~ nagative_label.grid(row=0, column=0, padx=20, pady=10)
+			# ~ nagative_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="NEGATIVE (N)", height=2)
+			# ~ nagative_text_label.grid(row=0, column=1, padx=20, pady=10)
+			# ~ low_copy_label = Label(self.annotate_result_frame, bg=LOW_COPY_COLOR, width=4, height=2)
+			# ~ low_copy_label.grid(row=1, column=0, padx=20, pady=10)
+			# ~ low_copy_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="LOW COPY (P_L)", height=2)
+			# ~ low_copy_text_label.grid(row=1, column=1, padx=20, pady=10)
+			# ~ positive_label = Label(self.annotate_result_frame, bg=POSITIVE_COLOR, width=4, height=2)
+			# ~ positive_label.grid(row=2, column=0, padx=20, pady=10)
+			# ~ positive_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="POSITIVE (P_H)", height=2)
+			# ~ positive_text_label.grid(row=2, column=1, padx=20, pady=10)
+			# ~ na_label = Label(self.annotate_result_frame, bg=NA_COLOR, width=4, height=2)
+			# ~ na_label.grid(row=3, column=0, padx=20, pady=10)
+			# ~ na_copy_text_label = Label(self.annotate_result_frame, bg=MAIN_FUNCTION_FRAME_BGD_COLOR, text="NO SAMPLE (N/A)", height=2)
+			# ~ na_copy_text_label.grid(row=3, column=1, padx=20, pady=10)
 
-			#Report Tab
-			self.report_frame = ScrollableFrame2(report_tab)
-			self.report_frame.pack(pady=5)
-			n=1
-			sample_button_list = list(range(48))
-			result_button_list = list(range(48))
-			number_button_list = list(range(48))
-
-			number0_button_list = Button(self.report_frame.scrollable_frame,
-							fg = LABEL_TXT_COLOR,
-							font = LABEL_TXT_FONT,
-							text= 'No',
-							width=2,
-							borderwidth = 0)
-			number0_button_list.grid(row=0, column=0, sticky=EW, padx=1, pady=1)
-
-			sample0_button_list = Button(self.report_frame.scrollable_frame,
-							fg = LABEL_TXT_COLOR,
-							font = LABEL_TXT_FONT,
-							text= 'Samples name',
-							width=30,
-							borderwidth = 0)
-			sample0_button_list.grid(row=0, column=1, sticky=EW, padx=1, pady=1)
-
-			result0_button_list = Button(self.report_frame.scrollable_frame,
-							fg = LABEL_TXT_COLOR,
-							font = LABEL_TXT_FONT,
-							text= 'Results',
-							width=5,
-							borderwidth = 0)
-			result0_button_list.grid(row=0, column=2, sticky=EW, padx=1, pady=1)
-
-			for i in range(0,48):
-				if(self.base_window.quantitative_analysis_2.id_list[i] != 'N/A'):
-
-					number_button_list[i] = Button(self.report_frame.scrollable_frame,
-							fg = LABEL_TXT_COLOR,
-							font = LABEL_TXT_FONT,
-							bg='lavender',
-							text= str(n),
-							width=2,
-							borderwidth = 0)
-					
-					number_button_list[i].grid(row=n, column=0, sticky=EW, padx=1, pady=1)
-
-					sample_button_list[i] = Button(self.report_frame.scrollable_frame,
-							fg = LABEL_TXT_COLOR,
-							font = LABEL_TXT_FONT,
-							bg='lavender',
-							width=35,
-							borderwidth = 0,
-							anchor=W)
-					# ~ sample_button_list[i].pack(pady=1, ipady=8, fill=BOTH, expand=TRUE)
-					sample_button_list[i].grid(row=n, column=1, sticky=EW, padx=1, pady=1)
-
-					result_button_list[i] = Button(self.report_frame.scrollable_frame,
-							fg = LABEL_TXT_COLOR,
-							font = LABEL_TXT_FONT,
-							width=25,
-							borderwidth = 0)
-					result_button_list[i].grid(row=n, column=2,padx=1, pady=1)
-
-					n+=1
-
-					if(round(self.result[i]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
-						sample_button_list[i]['text'] = self.base_window.quantitative_analysis_2.id_list[i]
-						result_button_list[i]['text'] = '0'
-						result_button_list[i]['bg'] = NEGATIVE_COLOR
-					elif(self.concen_result_list[i] <= 100):
-						sample_button_list[i]['text'] = self.base_window.quantitative_analysis_2.id_list[i]
-						result_button_list[i]['text'] = self.concen_result_list[i]
-						result_button_list[i]['bg'] = LOW_COPY_COLOR
-					elif(self.concen_result_list[i] > 100):
-						sample_button_list[i]['text'] = self.base_window.quantitative_analysis_2.id_list[i]
-						result_button_list[i]['text'] = self.concen_result_list[i]
-						result_button_list[i]['bg'] = POSITIVE_COLOR
-
-
-
+			
+			#Image Tab
 			img_labelframe_1 = LabelFrame(image_tab,
 										bg="black",
 										text="Raw Image",
@@ -4115,7 +4110,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 										font = LABELFRAME_TXT_FONT)
 			img_labelframe_2.pack(fill=BOTH, expand=TRUE, side=RIGHT)
 
-			a1 = Image.open(self.base_window.quantitative_analysis_1.analysis_result_folder + '/raw.jpg')
+			a1 = Image.open(self.base_window.quantitative_analysis_0.analysis_result_folder + '/raw.jpg')
 			a1_crop = a1.crop((x1-10, y1-10, x2+10, y2+10))
 			crop_width, crop_height = a1_crop.size
 			scale_percent = 100
@@ -4127,7 +4122,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 			a1_label.image = a1_display
 			a1_label.pack(fill=BOTH, expand=TRUE)
 
-			a2 = Image.open(self.base_window.quantitative_analysis_1.analysis_result_folder + '/process.jpg')
+			a2 = Image.open(self.base_window.quantitative_analysis_0.analysis_result_folder + '/process.jpg')
 			a2_crop = a2.crop((x1-10, y1-10, x2+10, y2+10))
 			crop_width, crop_height = a2_crop.size
 			scale_percent = 100
@@ -4154,25 +4149,28 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 			self.base_window.update_idletasks()
 
 
-			self.base_window.server_setting.check_status()
-			if(self.base_window.server_setting.server_active==1):
-				ftp = FTP(self.base_window.server_setting.ip_set, self.base_window.server_setting.user_set, self.base_window.server_setting.password_set, timeout=30)
-				ftp.cwd(self.base_window.server_setting.path_set + '/TemplateBlank')
+			# ~ self.base_window.server_setting.check_status()
+			# ~ if(self.base_window.server_setting.server_active==1):
+				# ~ ftp = FTP(self.base_window.server_setting.ip_set, self.base_window.server_setting.user_set, self.base_window.server_setting.password_set, timeout=30)
+				# ~ ftp.cwd(self.base_window.server_setting.path_set + '/TemplateBlank')
 				
-				localfolder = os.path.join(working_dir, 'template.xlsx')
-				file = open(localfolder,'wb')
-				ftp.retrbinary('RETR ' + 'template.xlsx', file.write)
-				file.close()
+				# ~ localfolder = os.path.join(working_dir, 'template.xlsm')
+				# ~ file = open(localfolder,'wb')
+				# ~ ftp.retrbinary('RETR ' + 'template.xlsm', file.write)
+				# ~ file.close()
 				
-				ftp.quit()
+				# ~ ftp.quit()
 				
-				#wb = load_workbook(working_dir + '/template.xlsm', keep_vba = True)
-				wb = load_workbook(self.base_window.quantitative_analysis_2.id_file_path, keep_vba = True)
-				sheet = wb.active
-			else:
-				wb = Workbook()
-				sheet = wb.active
-
+				# ~ #wb = load_workbook(working_dir + '/template.xlsm', keep_vba = True)
+				# ~ wb = load_workbook(self.base_window.quantitative_analysis_2.id_file_path, keep_vba = True)
+				# ~ sheet = wb.active
+			# ~ else:
+				# ~ wb = Workbook()
+				# ~ sheet = wb.active
+			
+			wb = Workbook()
+			sheet = wb.active
+			
 			font0 = Font(bold=False)
 			font1 = Font(size='14', bold=True, color='00FF0000')
 			font2 = Font(bold=True)
@@ -4202,16 +4200,15 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 			sheet["B7"].font = font2
 			sheet['B8'] = 'Test technician name: ' + self.base_window.quantitative_analysis_0.user_name
 			sheet["B8"].font = font2
-		
 			#global covid19dir_old
 			sheet['B9'] = 'Date: '
 			sheet["B9"].font = font2
-			sheet['B60'] = 'Note:'
-			sheet["B60"].font = font2
-			sheet['B61'] = '+ N/A: No sample'
-			sheet['B62'] = '+ N: Negative'
-			sheet['C61'] = '+ P_L: Low copy'
-			sheet['C62'] = '+ P_H: Positive'
+			# ~ sheet['B60'] = 'Note:'
+			# ~ sheet["B60"].font = font2
+			# ~ sheet['B61'] = '+ N/A: No sample'
+			# ~ sheet['B62'] = '+ N: Negative'
+			# ~ sheet['C61'] = '+ P_L: Low copy'
+			# ~ sheet['C62'] = '+ P_H: Positive'
 
 			sheet.merge_cells(start_row=64, start_column=4, end_row=64, end_column=6)
 			sheet.merge_cells(start_row=65, start_column=4, end_row=65, end_column=6)
@@ -4283,23 +4280,35 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[c1]=='N/A'):
 					sheet['D'+str(i+12)] = 'N/A'
 				else:
-					if(round(self.result[c1]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[c1]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						sheet['D'+str(i+12)] = '0'
 						sheet['D'+str(i+12)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
 						# ~ sheet['E'+str(i+12)] = '0'
-					elif(self.concen_result_list[c1] <= 100):
-						sheet['D'+str(i+12)] = self.concen_result_list[c1]
+					elif(self.concen_result_list[c1] < 100):
+						sheet['D'+str(i+12)] = '< 100'
 						sheet['D'+str(i+12)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
 						# ~ sheet['E'+str(i+12)] = self.concen_result_list[c1]
 						sheet['D'+str(i+12)].font = font2
 						sheet['B'+str(i+12)].font = font2
-					elif(self.concen_result_list[c1] > 100):
-						sheet['D'+str(i+12)] = self.concen_result_list[c1]
-						sheet['D'+str(i+12)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
+					elif(self.concen_result_list[c1] <= 1000):
+						sheet['D'+str(i+12)] = "100 - 1000"
+						sheet['D'+str(i+12)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
 						# ~ sheet['E'+str(i+12)] = self.concen_result_list[c1]
 						sheet['D'+str(i+12)].font = font2
 						sheet['B'+str(i+12)].font = font2
-
+					elif(self.concen_result_list[c1] <= 5000):
+						sheet['D'+str(i+12)] = "1001 - 5000"
+						sheet['D'+str(i+12)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+12)] = self.concen_result_list[c1]
+						sheet['D'+str(i+12)].font = font2
+						sheet['B'+str(i+12)].font = font2
+					else:
+						sheet['D'+str(i+12)] = "> 5000"
+						sheet['D'+str(i+12)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+12)] = self.concen_result_list[c1]
+						sheet['D'+str(i+12)].font = font2
+						sheet['B'+str(i+12)].font = font2
+						
 				sheet['F'+str(i+12)].protection = Protection(locked=False, hidden=False)
 
 				c2=c2+6
@@ -4307,23 +4316,35 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[c2]=='N/A'):
 					sheet['D'+str(i+20)] = 'N/A'
 				else:
-					if(round(self.result[c2]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[c2]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						sheet['D'+str(i+20)] = '0'
 						sheet['D'+str(i+20)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
 						# ~ sheet['E'+str(i+20)] = '0'
-					elif(self.concen_result_list[c2] <= 100):
-						sheet['D'+str(i+20)] = self.concen_result_list[c2]
+					elif(self.concen_result_list[c2] < 100):
+						sheet['D'+str(i+20)] = '< 100'
 						sheet['D'+str(i+20)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
-						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c2]
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
 						sheet['D'+str(i+20)].font = font2
 						sheet['B'+str(i+20)].font = font2
-					elif(self.concen_result_list[c2] > 100):
-						sheet['D'+str(i+20)] =  self.concen_result_list[c2]
-						sheet['D'+str(i+20)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
-						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c2]
+					elif(self.concen_result_list[c2] <= 1000):
+						sheet['D'+str(i+20)] = "100 - 1000"
+						sheet['D'+str(i+20)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
 						sheet['D'+str(i+20)].font = font2
 						sheet['B'+str(i+20)].font = font2
-
+					elif(self.concen_result_list[c2] <= 5000):
+						sheet['D'+str(i+20)] = "1001 - 5000"
+						sheet['D'+str(i+20)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
+						sheet['D'+str(i+20)].font = font2
+						sheet['B'+str(i+20)].font = font2
+					else:
+						sheet['D'+str(i+20)] = "> 5000"
+						sheet['D'+str(i+20)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
+						sheet['D'+str(i+20)].font = font2
+						sheet['B'+str(i+20)].font = font2
+						
 				sheet['F'+str(i+20)].protection = Protection(locked=False, hidden=False)
 
 				c3=c3+6
@@ -4331,20 +4352,32 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[c3]=='N/A'):
 					sheet['D'+str(i+28)] = 'N/A'
 				else:
-					if(round(self.result[c3]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[c3]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						sheet['D'+str(i+28)] = '0'
 						sheet['D'+str(i+28)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
-						# ~ sheet['E'+str(i+28)] = '0'
-					elif(self.concen_result_list[c3] <= 100):
-						sheet['D'+str(i+28)] = self.concen_result_list[c3]
+						# ~ sheet['E'+str(i+20)] = '0'
+					elif(self.concen_result_list[c3] < 100):
+						sheet['D'+str(i+28)] = '< 100'
 						sheet['D'+str(i+28)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
-						# ~ sheet['E'+str(i+28)] = self.concen_result_list[c3]
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
 						sheet['D'+str(i+28)].font = font2
 						sheet['B'+str(i+28)].font = font2
-					elif(self.concen_result_list[c3] > 100):
-						sheet['D'+str(i+28)] = self.concen_result_list[c3]
-						sheet['D'+str(i+28)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
-						# ~ sheet['E'+str(i+28)] = self.concen_result_list[c3]
+					elif(self.concen_result_list[c3] <= 1000):
+						sheet['D'+str(i+28)] = "100 - 1000"
+						sheet['D'+str(i+28)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
+						sheet['D'+str(i+28)].font = font2
+						sheet['B'+str(i+28)].font = font2
+					elif(self.concen_result_list[c3] <= 5000):
+						sheet['D'+str(i+28)] = "1001 - 5000"
+						sheet['D'+str(i+28)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
+						sheet['D'+str(i+28)].font = font2
+						sheet['B'+str(i+28)].font = font2
+					else:
+						sheet['D'+str(i+28)] = "> 5000"
+						sheet['D'+str(i+28)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+20)] = self.concen_result_list[c1]
 						sheet['D'+str(i+28)].font = font2
 						sheet['B'+str(i+28)].font = font2
 
@@ -4355,20 +4388,32 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[c4]=='N/A'):
 					sheet['D'+str(i+36)] = 'N/A'
 				else:
-					if(round(self.result[c4]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[c4]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						sheet['D'+str(i+36)] = '0'
 						sheet['D'+str(i+36)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
 						# ~ sheet['E'+str(i+36)] = '0'
-					elif(self.concen_result_list[c4] <= 100):
-						sheet['D'+str(i+36)] = self.concen_result_list[c4]
+					elif(self.concen_result_list[c4] < 100):
+						sheet['D'+str(i+36)] = '< 100'
 						sheet['D'+str(i+36)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
-						# ~ sheet['E'+str(i+36)] = self.concen_result_list[c4]
+						# ~ sheet['E'+str(i+36)] = self.concen_result_list[c1]
 						sheet['D'+str(i+36)].font = font2
 						sheet['B'+str(i+36)].font = font2
-					elif(self.concen_result_list[c4] > 100):
-						sheet['D'+str(i+36)] = self.concen_result_list[c4]
-						sheet['D'+str(i+36)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
-						# ~ sheet['E'+str(i+36)] = self.concen_result_list[c4]
+					elif(self.concen_result_list[c4] <= 1000):
+						sheet['D'+str(i+36)] = "100 - 1000"
+						sheet['D'+str(i+36)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+36)] = self.concen_result_list[c1]
+						sheet['D'+str(i+36)].font = font2
+						sheet['B'+str(i+36)].font = font2
+					elif(self.concen_result_list[c4] <= 5000):
+						sheet['D'+str(i+36)] = "1001 - 5000"
+						sheet['D'+str(i+36)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+36)] = self.concen_result_list[c1]
+						sheet['D'+str(i+36)].font = font2
+						sheet['B'+str(i+36)].font = font2
+					else:
+						sheet['D'+str(i+36)] = "> 5000"
+						sheet['D'+str(i+36)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+36)] = self.concen_result_list[c1]
 						sheet['D'+str(i+36)].font = font2
 						sheet['B'+str(i+36)].font = font2
 
@@ -4379,20 +4424,32 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[c5]=='N/A'):
 					sheet['D'+str(i+44)] = 'N/A'
 				else:
-					if(round(self.result[c5]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[c5]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						sheet['D'+str(i+44)] = '0'
 						sheet['D'+str(i+44)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
-						# ~ sheet['E'+str(i+44)] = '0'
-					elif(self.concen_result_list[c5] <= 100):
-						sheet['D'+str(i+44)] = self.concen_result_list[c5]
+						# ~ sheet['E'+str(i+36)] = '0'
+					elif(self.concen_result_list[c5] < 100):
+						sheet['D'+str(i+44)] = '< 100'
 						sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
-						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c5]
+						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c1]
 						sheet['D'+str(i+44)].font = font2
 						sheet['B'+str(i+44)].font = font2
-					elif(self.concen_result_list[c5] > 100):
-						sheet['D'+str(i+44)] = self.concen_result_list[c5]
-						sheet['D'+str(i+44)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
-						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c5]
+					elif(self.concen_result_list[c5] <= 1000):
+						sheet['D'+str(i+44)] = "100 - 1000"
+						sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c1]
+						sheet['D'+str(i+44)].font = font2
+						sheet['B'+str(i+44)].font = font2
+					elif(self.concen_result_list[c5] <= 5000):
+						sheet['D'+str(i+44)] = "1001 - 5000"
+						sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c1]
+						sheet['D'+str(i+44)].font = font2
+						sheet['B'+str(i+44)].font = font2
+					else:
+						sheet['D'+str(i+44)] = "> 5000"
+						sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c1]
 						sheet['D'+str(i+44)].font = font2
 						sheet['B'+str(i+44)].font = font2
 
@@ -4403,34 +4460,97 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				if(self.base_window.quantitative_analysis_2.id_list[c6]=='N/A'):
 					sheet['D'+str(i+52)] = 'N/A'
 				else:
-					if(round(self.result[c6]/self.base_window.system_check.threshold,2) < self.base_window.quantitative_analysis_1.n_base_value * NUM_1):
+					if(round(self.result[c6]/self.base_window.system_check.threshold,2) <= self.base_window.quantitative_analysis_1.n_base_value):
 						sheet['D'+str(i+52)] = '0'
 						sheet['D'+str(i+52)].fill = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
 						# ~ sheet['E'+str(i+52)] = '0'
-					elif(self.concen_result_list[c6] <= 100):
-						sheet['D'+str(i+52)] = self.concen_result_list[c6]
+					elif(self.concen_result_list[c6] < 100):
+						sheet['D'+str(i+52)] = '< 100'
 						sheet['D'+str(i+52)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
-						# ~ sheet['E'+str(i+52)] = self.concen_result_list[c6]
+						# ~ sheet['E'+str(i+52)] = self.concen_result_list[c1]
 						sheet['D'+str(i+52)].font = font2
 						sheet['B'+str(i+52)].font = font2
-					elif(self.concen_result_list[c6] > 100):
-						sheet['D'+str(i+52)] = self.concen_result_list[c6]
-						sheet['D'+str(i+52)].fill = PatternFill(start_color='00FF9999', end_color='00FF9999', fill_type='solid')
-						# ~ sheet['E'+str(i+52)] = self.concen_result_list[c6]
+					elif(self.concen_result_list[c6] <= 1000):
+						sheet['D'+str(i+52)] = "100 - 1000"
+						sheet['D'+str(i+52)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+52)] = self.concen_result_list[c1]
 						sheet['D'+str(i+52)].font = font2
 						sheet['B'+str(i+52)].font = font2
+					elif(self.concen_result_list[c6] <= 5000):
+						sheet['D'+str(i+52)] = "1001 - 5000"
+						sheet['D'+str(i+52)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+52)] = self.concen_result_list[c1]
+						sheet['D'+str(i+52)].font = font2
+						sheet['B'+str(i+52)].font = font2
+					else:
+						sheet['D'+str(i+44)] = "> 5000"
+						sheet['D'+str(i+44)].fill = PatternFill(start_color='00FFCCFF', end_color='00FFCCFF', fill_type='solid')
+						# ~ sheet['E'+str(i+44)] = self.concen_result_list[c1]
+						sheet['D'+str(i+44)].font = font2
+						sheet['B'+str(i+44)].font = font2
 
 				sheet['F'+str(i+52)].protection = Protection(locked=False, hidden=False)
 
 			sheet.print_area = 'A1:G70'
-			wb.save(self.base_window.quantitative_analysis_1.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name['text'] + '.xlsx')
+			wb.save(self.base_window.quantitative_analysis_0.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx')
 
+			# Report tab
+			self.report_frame = ScrollableFrame2(report_tab)
+			self.report_frame.pack(pady=5)
+			
+			wb = load_workbook(self.base_window.quantitative_analysis_0.result_folder_path +  '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx')
+			sheet = wb.active
+			
+			sample_button_list = list(range(49))
+			result_button_list = list(range(49))
+			position_button_list = list(range(49))
 
+			for i in range(0,49):
+				sample_pos = 'B' + str(i+11)
+				sample_button_list[i] = Button(self.report_frame.scrollable_frame,
+						fg = LABEL_TXT_COLOR,
+						font = LABEL_TXT_FONT,
+						text= sheet[sample_pos].value,
+						width=30,
+						bg = 'lavender',
+						borderwidth = 0)
+				sample_button_list[i].grid(row=i, column=0, sticky=EW, padx=1, pady=1)
+
+				position_pos = 'C' + str(i+11)
+				position_button_list[i] = Button(self.report_frame.scrollable_frame,
+						fg = LABEL_TXT_COLOR,
+						font = LABEL_TXT_FONT,
+						text= sheet[position_pos].value,
+						width=10,
+						bg = 'lavender',
+						borderwidth = 0)
+				position_button_list[i].grid(row=i, column=1, sticky=EW, padx=1, pady=1)
+
+				result_pos = 'D' + str(i+11)
+				result_button_list[i] = Button(self.report_frame.scrollable_frame,
+						fg = LABEL_TXT_COLOR,
+						font = LABEL_TXT_FONT,
+						text= sheet[result_pos].value,
+						width=22,
+						bg = 'lavender',
+						borderwidth = 0)
+				result_button_list[i].grid(row=i, column=3, sticky=EW, padx=1, pady=1)
+				
+				if(i>0 and result_button_list[i]['text'] != 'N/A'):
+					if(result_button_list[i]['text'] == '0'):
+						result_button_list[i]['bg'] = NEGATIVE_COLOR
+					else:
+						result_button_list[i]['bg'] = LOW_COPY_COLOR
+				
+			wb.close()
+			
 			if(os.path.exists(id_path + self.base_window.quantitative_analysis_2.id_file_name_label['text'] + '.xlsx')):
 				try:
 					shutil.move(id_path + self.base_window.quantitative_analysis_2.id_file_name_label['text'] + '.xlsx', id_old_path)
 				except:
 					pass
+					
+					
 
 			self.automail_check()
 			self.server_check()
@@ -4439,7 +4559,7 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 
 			msg = messagebox.showinfo("","COMPLETED")
 			self.base_window.update_idletasks()
-			subprocess.call(["scrot", self.base_window.quantitative_analysis_1.result_folder_path + "/result_capture.jpg"])
+			subprocess.call(["scrot", self.base_window.quantitative_analysis_0.result_folder_path + "/result_capture.jpg"])
 
 		else:
 			self.base_window.forget_page()
@@ -4451,15 +4571,15 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 		msg = messagebox.askquestion("","Do you want to go back to the main screen ?")
 		if(msg=="yes"):
 			self.base_window.forget_page()
-			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_option)
+			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.main_menu)
 			self.base_window.switch_page()
 			self.base_window.main_menu.reset()
 
 	def automail_check(self):
 		if(self.base_window.email_setting.account_active == 1 and self.base_window.quantitative_analysis_2.automail_is_on == 1):
-			shutil.make_archive(self.base_window.quantitative_analysis_1.result_folder_path,
-								format='zip',
-								root_dir = self.base_window.quantitative_analysis_1.result_folder_path)
+			# shutil.make_archive(self.base_window.qualitative_analysis_0.result_folder_path,
+			# 					format='zip',
+			# 					root_dir = self.base_window.qualitative_analysis_0.result_folder_path)
 			# ~ try:
 			AutoMail(
 				self.base_window.email_setting.email_address,
@@ -4467,25 +4587,44 @@ class QuantitativeAnalysisFrame3(QualitativeAnalysisFrame3):
 				self.base_window.quantitative_analysis_2.recipient_email,
 				"Spotcheck Result",
 				"This is an automatic email from Spotcheck device.",
-				self.base_window.quantitative_analysis_1.result_folder_path + '.zip',
-				self.base_window.quantitative_analysis_1.result_folder_name).send()
+				# self.base_window.qualitative_analysis_0.result_folder_path + '.zip',
+				self.base_window.quantitative_analysis_0.result_folder_path +  '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx',
+				self.base_window.quantitative_analysis_0.experiment_name).send()
 			# ~ except:
 				# ~ messagebox.showerror("","ERR 04")
 				# ~ pass
-				
-				
+		
 	def server_check(self):
 		self.base_window.server_setting.check_status()
 		if(self.base_window.server_setting.server_active==1):
 			try:
 				ftp = FTP(self.base_window.server_setting.ip_set, self.base_window.server_setting.user_set, self.base_window.server_setting.password_set, timeout=30)
 				ftp.cwd(self.base_window.server_setting.path_set + '/Processed_Data/Quantitative')
-				file = open(self.base_window.quantitative_analysis_1.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx','rb')
+				file = open(self.base_window.quantitative_analysis_0.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx','rb')
+				ftp.storbinary('STOR ' + self.base_window.quantitative_analysis_0.experiment_name + ".xlsx", file)
+				ftp.quit()
+				
+				ftp = FTP(self.base_window.server_setting.ip_set, self.base_window.server_setting.user_set, self.base_window.server_setting.password_set, timeout=30)
+				ftp.cwd(self.base_window.server_setting.path_set + '/Processed_Data/Temp')
+				file = open(self.base_window.quantitative_analysis_0.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx','rb')
 				ftp.storbinary('STOR ' + self.base_window.quantitative_analysis_0.experiment_name + ".xlsx", file)
 				ftp.quit()
 			except Exception as e :
 				messagebox.showwarning("There was an error while syncing the server",str(e))
 				pass
+		
+		# ~ self.base_window.server_setting.check_status()
+		# ~ if(self.base_window.server_setting.server_active==1):
+			# ~ try:
+				# ~ ftp = FTP(self.base_window.server_setting.ip_set, self.base_window.server_setting.user_set, self.base_window.server_setting.password_set, timeout=30)
+				# ~ ftp.cwd(self.base_window.server_setting.path_set + '/Processed_Data/Quantitative')
+				# ~ file = open(self.base_window.quantitative_analysis_1.result_folder_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx','rb')
+				# ~ ftp.storbinary('STOR ' + self.base_window.quantitative_analysis_0.experiment_name + ".xlsx", file)
+				# ~ ftp.quit()
+			# ~ except Exception as e :
+				# ~ messagebox.showwarning("There was an error while syncing the server",str(e))
+				# ~ pass
+				
 class QualitativeAnalysisFrame2(Frame):
 	def __init__(self, container):
 		super().__init__(container)
@@ -5154,10 +5293,95 @@ class QualitativeAnalysisFrame1(Frame):
 
 		wb.close()
 
-class QuantitativeAnalysisFrame1(QualitativeAnalysisFrame1):
+class QuantitativeAnalysisFrame1(Frame):
 	def __init__(self, container):
 		super().__init__(container)
-		self.title_label['text'] = "ANALYSIS"
+
+		self['bg'] = MAIN_FUNCTION_FRAME_BGD_COLOR
+		self.base_window = container
+
+		self.title_frame = Frame(self, bg = TITILE_FRAME_BGD_COLOR)
+		self.title_frame.pack(ipadx=0, ipady=5, fill=X)
+		self.work_frame = Frame(self, bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.work_frame.pack(expand=TRUE)
+		self.work_frame.pack_propagate(0)
+		self.button_frame = Frame(self, bg = MAIN_MENU_BUTTON_FRAME_BGD_COLOR)
+		self.button_frame.pack(fill=X, expand=TRUE)
+
+		# In title frame
+		self.title_label = Label(self.title_frame,
+								text = "ANALYSIS",
+								font = TITLE_TXT_FONT,
+								bg = TITILE_FRAME_BGD_COLOR,
+								fg = TITILE_FRAME_TXT_COLOR)
+		self.title_label.pack(expand=TRUE)
+
+		# In work frame
+		self.program_frame = ScrollableFrame(self.work_frame)
+		self.program_frame.grid(row=0, column=0, pady=20)
+
+		self.info_labelframe = LabelFrame(self.work_frame,
+								text = "Information",
+								font = LABELFRAME_TXT_FONT,
+								bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.info_labelframe.grid(row=0, column=1, rowspan=1, ipadx=10, ipady=5, padx=10, pady=28)
+
+		experiment_name_label = Label(self.info_labelframe,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							text = "Kit name:",
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT)
+		experiment_name_label.grid(row=0, column=0, padx=10, sticky=E)
+
+
+		self.experiment_name_text = Text(self.info_labelframe,
+							width = 30,
+							height = 1,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT,
+							state = 'disabled')
+		self.experiment_name_text.grid(row=0, column=1, padx=5, pady=10)
+
+		status_label = Label(self.info_labelframe,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							text = "Parameters:",
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT)
+		status_label.grid(row=3, column=0, padx=10, pady=10, sticky=NE)
+
+		self.status_text = Text(self.info_labelframe,
+							width = 30,
+							height = 12,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT,
+							state = 'disabled')
+		self.status_text.grid(row=3, column=1, padx=5, pady=10)
+
+		# In button frame
+		self.back_button = Button(self.button_frame,
+								text = "Back",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								# width = SWITCH_PAGE_BUTTON_WIDTH,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.back_clicked)
+		self.back_button.pack(side=LEFT, padx=0, pady=0, ipady=10, ipadx=30, anchor=W)
+
+		self.next_button = Button(self.button_frame,
+								text = "Next",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								# width = SWITCH_PAGE_BUTTON_WIDTH,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.next_clicked)
+		self.next_button.pack(side=RIGHT, padx=0, pady=0, ipady=10, ipadx=30, anchor=E)
+		
 
 	def back_clicked(self):
 		self.base_window.forget_page()
@@ -5167,31 +5391,31 @@ class QuantitativeAnalysisFrame1(QualitativeAnalysisFrame1):
 	def next_clicked(self):
 		self.program_name = self.experiment_name_text.get("1.0","end-1c")
 		if(len(self.program_name) != 0):
-			msg = messagebox.askokcancel("","Please make sure no sample is placed in the device !")
-			if(msg == True):
-				if os.path.exists(results_quantitative_path + self.program_name):
-					self.program_path = results_quantitative_path + self.program_name
-				else:
-					self.program_path = os.path.join(results_quantitative_path, self.program_name)
-					os.mkdir(self.program_path)
+			# ~ msg = messagebox.askokcancel("","Please make sure no sample is placed in the device !")
+			# ~ if(msg == True):
+				# ~ if os.path.exists(results_quantitative_path + self.program_name):
+					# ~ self.program_path = results_quantitative_path + self.program_name
+				# ~ else:
+					# ~ self.program_path = os.path.join(results_quantitative_path, self.program_name)
+					# ~ os.mkdir(self.program_path)
 
-				self.create_time = strftime(" %y-%m-%d %H.%M.%S")
-				self.result_folder_name = self.program_name + self.create_time
-				self.result_folder_path = os.path.join(self.program_path + '/', self.result_folder_name)
-				os.mkdir(self.result_folder_path)
-				print(self.result_folder_path)
+				# ~ self.create_time = strftime(" %y-%m-%d %H.%M.%S")
+				# ~ self.result_folder_name = self.program_name + self.create_time
+				# ~ self.result_folder_path = os.path.join(self.program_path + '/', self.result_folder_name)
+				# ~ os.mkdir(self.result_folder_path)
+				# ~ print(self.result_folder_path)
 
-				self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
-				os.mkdir(self.system_check_folder)
+				# ~ self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
+				# ~ os.mkdir(self.system_check_folder)
 
-				self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
-				os.mkdir(self.analysis_result_folder)
+				# ~ self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
+				# ~ os.mkdir(self.analysis_result_folder)
 
-				self.base_window.system_check.mode_check = 3
+				# ~ self.base_window.system_check.mode_check = 3
 				self.base_window.forget_page()
-				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.system_check)
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_2)
 				self.base_window.switch_page()
-				self.base_window.system_check.serial_handle()
+				# ~ self.base_window.system_check.serial_handle()
 
 		else:
 			messagebox.showwarning("","Please select the program !")
@@ -5218,9 +5442,89 @@ class QuantitativeAnalysisFrame1(QualitativeAnalysisFrame1):
 		wb = load_workbook(programs_quantitative_path + self.program_button[button_index]['text'] + ".xlsx")
 		sheet = wb.active
 
-		self.n_base_value = float(sheet["I2"].value)
-		self.a_value = float(sheet["E2"].value)
-		self.b_value = float(sheet["G2"].value)
+		# ~ self.n_base_value = float(sheet["I2"].value)
+		# ~ self.a_value = float(sheet["E2"].value)
+		# ~ self.b_value = float(sheetn["G2"].value)
+		
+		self.n_base_value = float(sheet["A1"].value)
+		
+		concen1_enalble = 1
+		concen2_enalble = 1
+		concen3_enalble = 1
+		concen4_enalble = 1
+		concen5_enalble = 1
+		try:
+			self.value1 = float(sheet["C2"].value)
+			self.concen1 = float(sheet["B2"].value)
+			concen_1_pt = [self.concen1, self.value1]
+		except:
+			concen1_enalble = 0
+			pass
+			
+		try:
+			self.value2 = float(sheet["C3"].value)
+			self.concen2 = float(sheet["B3"].value)
+			concen_2_pt = [self.concen2, self.value2]
+		except:
+			concen2_enalble = 0
+			pass
+			
+		try:
+			self.value3 = float(sheet["C4"].value)
+			self.concen3 = float(sheet["B4"].value)
+			concen_3_pt = [self.concen3, self.value3]
+		except:
+			concen3_enalble = 0
+			pass
+			
+		try:
+			self.value4 = float(sheet["C5"].value)
+			self.concen4 = float(sheet["B5"].value)
+			concen_4_pt = [self.concen4, self.value4]
+		except:
+			concen4_enalble = 0
+			pass
+			
+		try:
+			self.value5 = float(sheet["C6"].value)
+			self.concen5 = float(sheet["B6"].value)
+			concen_5_pt = [self.concen5, self.value5]
+		except:
+			concen5_enalble = 0
+			pass
+			
+		print("concen1_enalble: ", concen1_enalble)
+		print("concen2_enalble: ", concen2_enalble)
+		print("concen3_enalble: ", concen3_enalble)
+		print("concen4_enalble: ", concen4_enalble)
+		print("concen5_enalble: ", concen5_enalble)
+		
+		# ~ concen_1_pt = [1.3, 1.405]
+		# ~ concen_2_pt = [2, 1.46]
+		# ~ concen_3_pt = [3, 1.7]
+		# ~ concen_4_pt = [4, 1.87]
+		
+		pts_list = []
+		if(concen1_enalble != 0):
+			pts_list.append(concen_1_pt)
+		if(concen2_enalble != 0):
+			pts_list.append(concen_2_pt)
+		if(concen3_enalble != 0):
+			pts_list.append(concen_3_pt)
+		if(concen4_enalble != 0):
+			pts_list.append(concen_4_pt)
+		if(concen5_enalble != 0):
+			pts_list.append(concen_5_pt)
+		
+		pts_list = np.array(pts_list)
+		print("pts_list: ", pts_list)
+		x = pts_list[:,0]
+		y = pts_list[:,1]
+		self.a_value, self.b_value = np.polyfit(x,y,1)
+		self.a_value = round(self.a_value, 4)
+		self.b_value = round(self.b_value, 4)
+		print("a_value: ", self.a_value)
+		print("b_value: ", self.b_value)
 
 		self.experiment_name_text['state'] = "normal"
 		self.experiment_name_text.delete('1.0',END)
@@ -5230,29 +5534,47 @@ class QuantitativeAnalysisFrame1(QualitativeAnalysisFrame1):
 			pass
 		self.experiment_name_text['state'] = "disabled"
 
-		self.user_name_text['state'] = "normal"
-		self.user_name_text.delete('1.0',END)
-		try:
-			self.user_name_text.insert('1.0', sheet["C2"].value)
-		except:
-			pass
-		self.user_name_text['state'] = "disabled"
+		# ~ self.user_name_text['state'] = "normal"
+		# ~ self.user_name_text.delete('1.0',END)
+		# ~ try:
+			# ~ self.user_name_text.insert('1.0', sheet["C2"].value)
+		# ~ except:
+			# ~ pass
+		# ~ self.user_name_text['state'] = "disabled"
 
-		self.pfi_text['state'] = "normal"
-		self.pfi_text.delete('1.0',END)
-		try:
-			self.pfi_text.insert('1.0', sheet["I2"].value)
-		except:
-			pass
-		self.pfi_text['state'] = "disabled"
+		# ~ self.pfi_text['state'] = "normal"
+		# ~ self.pfi_text.delete('1.0',END)
+		# ~ try:
+			# ~ self.pfi_text.insert('1.0', sheet["I2"].value)
+		# ~ except:
+			# ~ pass
+		# ~ self.pfi_text['state'] = "disabled"
 
-		self.comment_text['state'] = "normal"
-		self.comment_text.delete('1.0',END)
+		self.status_text['state'] = "normal"
+		self.status_text.delete('1.0',END)
 		try:
-			self.comment_text.insert('1.0', sheet["C3"].value)
+			if(concen1_enalble != 0):
+				self.status_text.insert(END, str(sheet["B2"].value) + ': ')
+				self.status_text.insert(END, str(sheet["C2"].value) + '\n')
+			if(concen2_enalble != 0):
+				self.status_text.insert(END, str(sheet["B3"].value) + ': ')
+				self.status_text.insert(END, str(sheet["C3"].value) + '\n')
+			if(concen3_enalble != 0):
+				self.status_text.insert(END, str(sheet["B4"].value) + ': ')
+				self.status_text.insert(END, str(sheet["C4"].value) + '\n')
+			if(concen4_enalble != 0):
+				self.status_text.insert(END, str(sheet["B5"].value) + ': ')
+				self.status_text.insert(END, str(sheet["C5"].value) + '\n')
+			if(concen5_enalble != 0):
+				self.status_text.insert(END, str(sheet["B6"].value) + ': ')
+				self.status_text.insert(END, str(sheet["C6"].value) + '\n')
+			self.status_text.insert(END, "a_value: " + str(self.a_value) + '\n')
+			self.status_text.insert(END, "b_value: " + str(self.b_value) + '\n')
+			self.status_text.insert(END, "n_base_value: " + str(self.n_base_value) + '\n')
+
 		except:
 			pass
-		self.comment_text['state'] = "disabled"
+		self.status_text['state'] = "disabled"
 
 		wb.close()
 
@@ -5374,41 +5696,62 @@ class QualitativeAnalysisFrame0(Frame):
 		fw_info.writelines(self.user_name + '\n')
 		fw_info.close()
 		
-		### NEW ADD - START ###
 		self.create_time = strftime("%y-%m-%d")
 		self.result_folder_name_0 = self.create_time
 		self.create_time_1 = strftime("%Hh%Mm%Ss")
 		
-		if not os.path.exists(results_path + self.result_folder_name_0):
-			 self.result_folder_path_0  = os.path.join(results_path , self.result_folder_name_0)
-			 os.mkdir(self.result_folder_path_0)
+		if not os.path.exists(results_qualitative_path + self.result_folder_name_0):
+			self.result_folder_path_0  = os.path.join(results_qualitative_path , self.result_folder_name_0)
+			os.mkdir(self.result_folder_path_0)
 		else:
-			self.result_folder_path_0 = results_path +  self.result_folder_name_0
-		
+			self.result_folder_path_0 = results_qualitative_path +  self.result_folder_name_0
+			 
 		if(self.experiment_name != ''):
 			self.result_folder_name = self.experiment_name
 		else:
 			self.result_folder_name = self.create_time_1
 			self.experiment_name = self.create_time_1
-		self.result_folder_path = os.path.join(self.result_folder_path_0, self.result_folder_name)
-		os.mkdir(self.result_folder_path)
-		print(self.result_folder_path)
 		
-		self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
-		os.mkdir(self.system_check_folder)
+		if not os.path.exists(self.result_folder_path_0 + '/' + self.result_folder_name + '/'):
+			self.result_folder_path = os.path.join(self.result_folder_path_0, self.result_folder_name)
+			os.mkdir(self.result_folder_path)
+			print(self.result_folder_path)
+			
+			self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
+			os.mkdir(self.system_check_folder)
 
-		self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
-		os.mkdir(self.analysis_result_folder)
+			self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
+			os.mkdir(self.analysis_result_folder)
+			
+			# ~ self.base_window.system_check.mode_check = 1
+			
+			self.base_window.forget_page()
+			#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
+			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_2)
+			self.base_window.switch_page()
+			
+		else:
+			msg = messagebox.askquestion("","This folder already exists, do you want to overwrite it ?")
+			if(msg == 'yes'):
+				print("self.result_folder_path_0: ", self.result_folder_path_0)
+				self.result_folder_path = self.result_folder_path_0 + '/' + self.result_folder_name
+				shutil.rmtree(self.result_folder_path_0 + '/' + self.result_folder_name)
+				os.mkdir(self.result_folder_path)
+				
+				self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
+				os.mkdir(self.system_check_folder)
+
+				self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
+				os.mkdir(self.analysis_result_folder)
+				
+				# ~ self.base_window.system_check.mode_check = 1
+				
+				self.base_window.forget_page()
+				#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_2)
+				self.base_window.switch_page()
+				
 		
-		# ~ self.base_window.system_check.mode_check = 1
-		### NEW ADD - END ###
-		
-		self.base_window.forget_page()
-		#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
-		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_2)
-		self.base_window.switch_page()
-
-
 class QuantitativeAnalysisFrame0(QualitativeAnalysisFrame0):
 	def __init__(self, container):
 		super().__init__(container)
@@ -5422,15 +5765,78 @@ class QuantitativeAnalysisFrame0(QualitativeAnalysisFrame0):
 	def next_clicked(self):
 		self.experiment_name = self.experiment_name_entry.get()
 		self.user_name = self.user_name_entry.get()
-		if(self.experiment_name==''):
-			messagebox.showwarning("","Plese enter Folder Name !")
-		elif (self.user_name==''):
-			messagebox.showwarning("","Plese enter User Name !")
+		self.template_name = self.template_name_entry.get()
+		# ~ if(self.experiment_name==''):
+			# ~ messagebox.showwarning("","Plese enter Folder Name !")
+		# ~ elif (self.user_name==''):
+			# ~ messagebox.showwarning("","Plese enter User Name !")
+		# ~ elif(self.template_name == ''):
+			# ~ messagebox.showwarning("","Plese enter Template Name !")
+		# ~ else:
+		
+		global autofill_email, autofill_user
+		autofill_user = self.user_name
+		fw_info = open('/home/pi/Spotcheck/.oldinfo.txt', 'w')
+		fw_info.writelines(autofill_email + '\n')
+		fw_info.writelines(self.user_name + '\n')
+		fw_info.close()
+		
+		self.create_time = strftime("%y-%m-%d")
+		self.result_folder_name_0 = self.create_time
+		self.create_time_1 = strftime("%Hh%Mm%Ss")
+		
+		if not os.path.exists(results_quantitative_path + self.result_folder_name_0):
+			self.result_folder_path_0  = os.path.join(results_quantitative_path , self.result_folder_name_0)
+			os.mkdir(self.result_folder_path_0)
 		else:
+			self.result_folder_path_0 = results_quantitative_path +  self.result_folder_name_0
+			 
+		if(self.experiment_name != ''):
+			self.result_folder_name = self.experiment_name
+		else:
+			self.result_folder_name = self.create_time_1
+			self.experiment_name = self.create_time_1
+		
+		if not os.path.exists(self.result_folder_path_0 + '/' + self.result_folder_name + '/'):
+			self.result_folder_path = os.path.join(self.result_folder_path_0, self.result_folder_name)
+			os.mkdir(self.result_folder_path)
+			print(self.result_folder_path)
+			
+			self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
+			os.mkdir(self.system_check_folder)
+
+			self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
+			os.mkdir(self.analysis_result_folder)
+			
+			# ~ self.base_window.system_check.mode_check = 1
+			
 			self.base_window.forget_page()
+			#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
 			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_1)
 			self.base_window.switch_page()
 			self.base_window.quantitative_analysis_1.load_program()
+			
+		else:
+			msg = messagebox.askquestion("","This folder already exists, do you want to overwrite it ?")
+			if(msg == 'yes'):
+				print("self.result_folder_path_0: ", self.result_folder_path_0)
+				self.result_folder_path = self.result_folder_path_0 + '/' + self.result_folder_name
+				shutil.rmtree(self.result_folder_path_0 + '/' + self.result_folder_name)
+				os.mkdir(self.result_folder_path)
+				
+				self.system_check_folder = os.path.join(self.result_folder_path, "System_Check")
+				os.mkdir(self.system_check_folder)
+
+				self.analysis_result_folder = os.path.join(self.result_folder_path, "Analysis Results")
+				os.mkdir(self.analysis_result_folder)
+				
+				# ~ self.base_window.system_check.mode_check = 1
+				
+				self.base_window.forget_page()
+				#self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_1)
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_1)
+				self.base_window.switch_page()
+				self.base_window.quantitative_analysis_1.load_program()
 
 
 class IDCreateFrame(Frame):
@@ -5451,6 +5857,7 @@ class IDCreateFrame(Frame):
 		self.work_frame.pack(expand=TRUE)
 		self.button_frame = Frame(self, bg = MAIN_MENU_BUTTON_FRAME_BGD_COLOR)
 		self.button_frame.pack(fill=X)
+		
 
 		# In title frame
 		self.title_label = Label(self.title_frame,
@@ -5845,12 +6252,12 @@ class IDCreateFrame(Frame):
 					file_name = self.base_window.qualitative_analysis_0.experiment_name
 					file_create_done = 1
 					self.base_window.qualitative_analysis_2.id_file_path = id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsx'
-			# ~ elif(self.direct_create == 1):
-				# ~ wb.save(id_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsm')
-				# ~ msg = messagebox.askquestion("","File has been created.\n Do you want to go back to the previous step?")
-				# ~ if(msg=="yes"):
-					# ~ file_name = self.base_window.quantitative_analysis_0.experiment_name
-					# ~ file_create_done = 1
+			elif(self.direct_create == 2):
+				wb.save(id_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx')
+				msg = messagebox.askquestion("","File has been created.\n Do you want to go back to the previous step?")
+				if(msg=="yes"):
+					file_name = self.base_window.quantitative_analysis_0.experiment_name
+					file_create_done = 1
 			else:
 				path = filedialog.asksaveasfilename(initialdir = id_path + '/', defaultextension='.xlsx')
 				if path is not None:
@@ -5871,7 +6278,6 @@ class IDCreateFrame(Frame):
 				if(self.direct_create == 0): #create file with create module from main menu
 					self.back_clicked()
 				elif(self.direct_create==1): #create file with create module from qualitative_analysis_2
-					
 					wb = load_workbook(id_path + '/' + self.base_window.qualitative_analysis_0.experiment_name + '.xlsx')
 					sheet = wb.active					
 					self.base_window.qualitative_analysis_2.id_list[0] = sheet["B12"].value
@@ -5929,13 +6335,6 @@ class IDCreateFrame(Frame):
 					self.base_window.qualitative_analysis_2.id_list[45] = sheet["B43"].value
 					self.base_window.qualitative_analysis_2.id_list[46] = sheet["B51"].value
 					self.base_window.qualitative_analysis_2.id_list[47] = sheet["B59"].value
-			
-					
-					# ~ for i in range(0,48):
-						# ~ if(self.well_button[i]['text'][0] != '#' or self.well_button[i]['text'][0] != 'N/A'):
-							# ~ self.base_window.qualitative_analysis_2.id_list[i] = self.well_button[i]['text']
-						# ~ else:
-							# ~ self.base_window.qualitative_analysis_2.id_list[i] = 'N/A'
 
 					self.base_window.qualitative_analysis_2.id_file_name_label['text'] = file_name
 					self.base_window.qualitative_analysis_2.id_file_name_label['bg'] = 'lawn green'
@@ -5967,7 +6366,6 @@ class IDCreateFrame(Frame):
 						# ~ self.base_window.qualitative_analysis_2.tooltip[i] = Pmw.Balloon(self.base_window)
 						# ~ self.base_window.qualitative_analysis_2.tooltip[i].bind(self.base_window.qualitative_analysis_2.id_label[i], self.base_window.qualitative_analysis_2.id_list[i])
 
-
 						if(self.base_window.qualitative_analysis_2.id_list[i] != '#' and self.base_window.qualitative_analysis_2.id_list[i] != 'N/A'):
 							self.base_window.qualitative_analysis_2.id_label[i]['bg'] = "lawn green"
 							self.base_window.qualitative_analysis_2.id_label[i]['text'] = self.base_window.qualitative_analysis_2.id_list[i]
@@ -5976,32 +6374,80 @@ class IDCreateFrame(Frame):
 							self.base_window.qualitative_analysis_2.id_label[i]['text'] = "N/A"
 
 						self.base_window.qualitative_analysis_2.id_label[i].grid(row=r, column=c, padx=1, pady=1)
-					
-					# ~ self.base_window.qualitative_analysis_2.id_label[47]['text'] = 'B'
-					# ~ self.base_window.qualitative_analysis_2.id_label[47]['bg'] = 'blue'
-					
-					
+
 					self.back_clicked()
 					msg = messagebox.askokcancel("","Now you can put samples in and press Next to analyze.")
 
 				elif(self.direct_create==2):
-					for i in range(0,48):
-						if(self.well_button[i]['text'][0] != '#'):
-							self.base_window.quantitative_analysis_2.id_list[i] = self.well_button[i]['text']
-						else:
-							self.base_window.quantitative_analysis_2.id_list[i] = 'N/A'
+					wb = load_workbook(id_path + '/' + self.base_window.quantitative_analysis_0.experiment_name + '.xlsx')
+					sheet = wb.active					
+					self.base_window.quantitative_analysis_2.id_list[0] = sheet["B12"].value
+					self.base_window.quantitative_analysis_2.id_list[1] = sheet["B20"].value
+					self.base_window.quantitative_analysis_2.id_list[2] = sheet["B28"].value
+					self.base_window.quantitative_analysis_2.id_list[3] = sheet["B36"].value
+					self.base_window.quantitative_analysis_2.id_list[4] = sheet["B44"].value
+					self.base_window.quantitative_analysis_2.id_list[5] = sheet["B52"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[6] = sheet["B13"].value
+					self.base_window.quantitative_analysis_2.id_list[7] = sheet["B21"].value
+					self.base_window.quantitative_analysis_2.id_list[8] = sheet["B29"].value
+					self.base_window.quantitative_analysis_2.id_list[9] = sheet["B37"].value
+					self.base_window.quantitative_analysis_2.id_list[10] = sheet["B45"].value
+					self.base_window.quantitative_analysis_2.id_list[11] = sheet["B53"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[12] = sheet["B14"].value
+					self.base_window.quantitative_analysis_2.id_list[13] = sheet["B22"].value
+					self.base_window.quantitative_analysis_2.id_list[14] = sheet["B30"].value
+					self.base_window.quantitative_analysis_2.id_list[15] = sheet["B38"].value
+					self.base_window.quantitative_analysis_2.id_list[16] = sheet["B46"].value
+					self.base_window.quantitative_analysis_2.id_list[17] = sheet["B54"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[18] = sheet["B15"].value
+					self.base_window.quantitative_analysis_2.id_list[19] = sheet["B23"].value
+					self.base_window.quantitative_analysis_2.id_list[20] = sheet["B31"].value
+					self.base_window.quantitative_analysis_2.id_list[21] = sheet["B39"].value
+					self.base_window.quantitative_analysis_2.id_list[22] = sheet["B47"].value
+					self.base_window.quantitative_analysis_2.id_list[23] = sheet["B55"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[24] = sheet["B16"].value
+					self.base_window.quantitative_analysis_2.id_list[25] = sheet["B24"].value
+					self.base_window.quantitative_analysis_2.id_list[26] = sheet["B32"].value
+					self.base_window.quantitative_analysis_2.id_list[27] = sheet["B40"].value
+					self.base_window.quantitative_analysis_2.id_list[28] = sheet["B48"].value
+					self.base_window.quantitative_analysis_2.id_list[29] = sheet["B56"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[30] = sheet["B17"].value
+					self.base_window.quantitative_analysis_2.id_list[31] = sheet["B25"].value
+					self.base_window.quantitative_analysis_2.id_list[32] = sheet["B33"].value
+					self.base_window.quantitative_analysis_2.id_list[33] = sheet["B41"].value
+					self.base_window.quantitative_analysis_2.id_list[34] = sheet["B49"].value
+					self.base_window.quantitative_analysis_2.id_list[35] = sheet["B57"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[36] = sheet["B18"].value
+					self.base_window.quantitative_analysis_2.id_list[37] = sheet["B26"].value
+					self.base_window.quantitative_analysis_2.id_list[38] = sheet["B34"].value
+					self.base_window.quantitative_analysis_2.id_list[39] = sheet["B42"].value
+					self.base_window.quantitative_analysis_2.id_list[40] = sheet["B50"].value
+					self.base_window.quantitative_analysis_2.id_list[41] = sheet["B58"].value
+					
+					self.base_window.quantitative_analysis_2.id_list[42] = sheet["B19"].value
+					self.base_window.quantitative_analysis_2.id_list[43] = sheet["B27"].value
+					self.base_window.quantitative_analysis_2.id_list[44] = sheet["B35"].value
+					self.base_window.quantitative_analysis_2.id_list[45] = sheet["B43"].value
+					self.base_window.quantitative_analysis_2.id_list[46] = sheet["B51"].value
+					self.base_window.quantitative_analysis_2.id_list[47] = sheet["B59"].value
 
 					self.base_window.quantitative_analysis_2.id_file_name_label['text'] = file_name
 					self.base_window.quantitative_analysis_2.id_file_name_label['bg'] = 'lawn green'
 
 					try:
-						for i in range(0,48):
+						for i in range(0,47):
 							self.base_window.quantitative_analysis_2.id_label[i].destroy()
 					except:
 						pass
 
 					# ~ Pmw.initialise(self.base_window)
-					# ~ self.base_window.quantitative_analysis_2.tooltip = list(range(48))
+					# ~ self.base_window.qualitative_analysis_2.tooltip = list(range(48))
 
 					self.base_window.quantitative_analysis_2.id_label = list(range(48))
 					r=0
@@ -6018,17 +6464,15 @@ class IDCreateFrame(Frame):
 												# ~ bg = RESULT_LABEL_BGD_COLOR,
 												font = RESULT_LABEL_TXT_FONT)
 
-						# ~ self.base_window.quantitative_analysis_2.tooltip[i] = Pmw.Balloon(self.base_window)
-						# ~ self.base_window.quantitative_analysis_2.tooltip[i].bind(self.base_window.quantitative_analysis_2.id_label[i], self.base_window.quantitative_analysis_2.id_list[i])
+						# ~ self.base_window.qualitative_analysis_2.tooltip[i] = Pmw.Balloon(self.base_window)
+						# ~ self.base_window.qualitative_analysis_2.tooltip[i].bind(self.base_window.qualitative_analysis_2.id_label[i], self.base_window.qualitative_analysis_2.id_list[i])
 
-
-						if(self.well_button[i]['text'][0] != '#'):
+						if(self.base_window.quantitative_analysis_2.id_list[i] != '#' and self.base_window.quantitative_analysis_2.id_list[i] != 'N/A'):
 							self.base_window.quantitative_analysis_2.id_label[i]['bg'] = "lawn green"
 							self.base_window.quantitative_analysis_2.id_label[i]['text'] = self.base_window.quantitative_analysis_2.id_list[i]
 						else:
 							self.base_window.quantitative_analysis_2.id_label[i]['bg'] = "grey80"
 							self.base_window.quantitative_analysis_2.id_label[i]['text'] = "N/A"
-
 
 						self.base_window.quantitative_analysis_2.id_label[i].grid(row=r, column=c, padx=1, pady=1)
 
@@ -7139,14 +7583,75 @@ class QualitativeCalibListFrame(QualitativeAnalysisFrame1):
 		self.base_window.switch_page()
 
 
-class QuantitativeCalibListFrame(QuantitativeAnalysisFrame1):
+class QuantitativeCalibListFrame(Frame):
 	def __init__(self, container):
 		super().__init__(container)
-		self.title_label['text'] = "CALIBRATION"
 
+		self['bg'] = MAIN_FUNCTION_FRAME_BGD_COLOR
+		self.base_window = container
+		
+		self.title_frame = Frame(self, bg = TITILE_FRAME_BGD_COLOR)
+		self.title_frame.pack(ipadx=0, ipady=5, fill=X)
+		self.work_frame = Frame(self, bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.work_frame.pack(expand=TRUE)
+		self.work_frame.pack_propagate(0)
+		self.button_frame = Frame(self, bg = MAIN_MENU_BUTTON_FRAME_BGD_COLOR)
+		self.button_frame.pack(fill=X, expand=TRUE)
+
+		# In title frame
+		self.title_label = Label(self.title_frame,
+								text = "KITS MANAGEMENT",
+								font = TITLE_TXT_FONT,
+								bg = TITILE_FRAME_BGD_COLOR,
+								fg = TITILE_FRAME_TXT_COLOR)
+		self.title_label.pack(expand=TRUE)
+
+		# In work frame
+		self.program_frame = ScrollableFrame(self.work_frame)
+		self.program_frame.grid(row=0, column=0, pady=17, sticky=S)
+
+		self.info_labelframe = LabelFrame(self.work_frame,
+								text = "Information",
+								font = LABELFRAME_TXT_FONT,
+								bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.info_labelframe.grid(row=0, column=1, rowspan=3, ipadx=10, ipady=5, padx=10, pady=28)
+
+		experiment_name_label = Label(self.info_labelframe,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							text = "Kit name:",
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT)
+		experiment_name_label.grid(row=0, column=0, padx=10, sticky=E)
+
+
+		self.experiment_name_text = Text(self.info_labelframe,
+							width = 30,
+							height = 1,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT,)
+							# ~ state = 'disabled')
+		self.experiment_name_text.grid(row=0, column=1, padx=5, pady=30)
+
+		properties_label = Label(self.info_labelframe,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							text = "Properties:",
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT)
+		properties_label.grid(row=3, column=0, padx=10, pady=30, sticky=NE)
+
+		self.properties_text = Text(self.info_labelframe,
+							width = 30,
+							height = 12,
+							bg = MAIN_FUNCTION_FRAME_BGD_COLOR,
+							fg = LABEL_TXT_COLOR,
+							font = LABEL_TXT_FONT,
+							state = 'disabled')
+		self.properties_text.grid(row=3, column=1, padx=5, pady=30)
+		
 		self.edit_frame = Frame(self.work_frame,
 								bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
-		self.edit_frame.grid(row=1, column=0, sticky=EW)
+		self.edit_frame.grid(row=1, column=0)
 
 		new_button = Button(self.edit_frame,
 								text = "New",
@@ -7157,18 +7662,18 @@ class QuantitativeCalibListFrame(QuantitativeAnalysisFrame1):
 								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
 								borderwidth = 0,
 								command = self.new_clicked)
-		new_button.grid(row=0, column=0, ipadx=35, ipady=10)
+		new_button.grid(row=0, column=0, ipadx=35, ipady=10, padx=10)
 
-		recalibration_button = Button(self.edit_frame,
-								text = "Recalibration",
-								font = SWITCH_PAGE_BUTTON_FONT,
-								# width = SWITCH_PAGE_BUTTON_WIDTH,
-								# height = SWITCH_PAGE_BUTTON_HEIGHT,
-								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
-								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
-								borderwidth = 0,
-								command = self.recalibration_clicked)
-		recalibration_button.grid(row=0, column=1, padx=10, ipadx=10, ipady=10)
+		# ~ modify_button = Button(self.edit_frame,
+								# ~ text = "Modify",
+								# ~ font = SWITCH_PAGE_BUTTON_FONT,
+								# ~ # width = SWITCH_PAGE_BUTTON_WIDTH,
+								# ~ # height = SWITCH_PAGE_BUTTON_HEIGHT,
+								# ~ bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								# ~ fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								# ~ borderwidth = 0,
+								# ~ command = self.modify_clicked)
+		# ~ modify_button.grid(row=0, column=1, padx=10, ipadx=30, ipady=10)
 
 		delete_button = Button(self.edit_frame,
 								text = "Delete",
@@ -7179,9 +7684,19 @@ class QuantitativeCalibListFrame(QuantitativeAnalysisFrame1):
 								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
 								borderwidth = 0,
 								command = self.delete_clicked)
-		delete_button.grid(row=0, column=2, ipadx=30, ipady=10)
+		delete_button.grid(row=0, column=1, ipadx=30, ipady=10, padx=10)
 
-		self.next_button.pack_forget()
+		# In button frame
+		self.back_button = Button(self.button_frame,
+								text = "Back",
+								font = SWITCH_PAGE_BUTTON_FONT,
+								# width = SWITCH_PAGE_BUTTON_WIDTH,
+								# height = SWITCH_PAGE_BUTTON_HEIGHT,
+								bg = SWITCH_PAGE_BUTTON_BGD_COLOR,
+								fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
+								borderwidth = 0,
+								command = self.back_clicked)
+		self.back_button.pack(side=LEFT, padx=0, pady=0, ipady=10, ipadx=30, anchor=W)
 
 	def delete_clicked(self):
 		self.program_name = self.experiment_name_text.get("1.0","end-1c")
@@ -7191,72 +7706,88 @@ class QuantitativeCalibListFrame(QuantitativeAnalysisFrame1):
 				os.remove(programs_quantitative_path + self.experiment_name_text.get("1.0","end-1c") + '.xlsx')
 				self.load_program()
 				self.experiment_name_text['state'] = "normal"
-				self.user_name_text['state'] = "normal"
-				self.pfi_text['state'] = "normal"
-				self.comment_text['state'] = "normal"
+				self.properties_text['state'] = "normal"
 				self.experiment_name_text.delete('1.0',END)
-				self.user_name_text.delete('1.0',END)
-				self.pfi_text.delete('1.0', END)
-				self.comment_text.delete('1.0',END)
+				self.properties_text.delete('1.0',END)
 				self.experiment_name_text['state'] = "disabled"
-				self.user_name_text['state'] = "disabled"
-				self.pfi_text['state'] = "disabled"
-				self.comment_text['state'] = "disabled"
+				self.properties_text['state'] = "disabled"
 				messagebox.showinfo("","Deleted")
 		else:
 			messagebox.showwarning("","Please select the kit !")
 
 
-	def recalibration_clicked(self):
-		self.program_name = self.experiment_name_text.get("1.0","end-1c")
-		if(len(self.program_name) != 0):
-			msg = messagebox.askquestion("","Are you sure you want to recalibrate this kit ?")
-			if(msg == 'yes'):
-				os.remove(programs_quantitative_path + self.experiment_name_text.get("1.0","end-1c") + '.xlsx')
-				self.load_program()
+	# ~ def modify_clicked(self):
+		# ~ self.program_name = self.experiment_name_text.get("1.0","end-1c")
+		# ~ if(len(self.program_name) != 0):
+			# ~ os.remove(programs_quantitative_path + self.experiment_name_text.get("1.0","end-1c") + '.xlsx')
+			# ~ self.load_program()
 
-				self.base_window.new_quantitative_1.experiment_name_entry.delete(0,END)
-				self.base_window.new_quantitative_1.user_name_entry.delete(0,END)
-				self.base_window.new_quantitative_1.comments_text.delete('1.0',END)
+			# ~ self.base_window.new_quantitative_1.experiment_name_entry.delete(0,END)
+			# ~ self.base_window.new_quantitative_1.properties_text.delete('1.0',END)
 
-				self.base_window.forget_page()
-				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.new_quantitative_1)
-				self.base_window.switch_page()
+			# ~ self.base_window.forget_page()
+			# ~ self.base_window.page_num = self.base_window.frame_list.index(self.base_window.new_quantitative_1)
+			# ~ self.base_window.switch_page()
 
-				self.base_window.new_quantitative_1.experiment_name_entry.insert(0, self.experiment_name_text.get("1.0",'end-1c'))
-				self.base_window.new_quantitative_1.user_name_entry.insert(0, self.user_name_text.get("1.0",'end-1c'))
-				self.base_window.new_quantitative_1.comments_text.insert('1.0', self.comment_text.get("1.0",'end-1c'))
+			# ~ self.base_window.new_quantitative_1.experiment_name_entry.insert(0, self.experiment_name_text.get("1.0",'end-1c'))
+			# ~ self.base_window.new_quantitative_1.properties_text.insert('1.0', self.comment_text.get("1.0",'end-1c'))
 
-				os.remove(programs_quantitative_path + self.experiment_name_text.get("1.0","end-1c") + '.xlsx')
-				self.load_program()
-				self.experiment_name_text['state'] = "normal"
-				self.user_name_text['state'] = "normal"
-				self.pfi_text['state'] = "normal"
-				self.comment_text['state'] = "normal"
-				self.experiment_name_text.delete('1.0',END)
-				self.user_name_text.delete('1.0',END)
-				self.pfi_text.delete('1.0', END)
-				self.comment_text.delete('1.0',END)
-				self.experiment_name_text['state'] = "disabled"
-				self.user_name_text['state'] = "disabled"
-				self.pfi_text['state'] = "disabled"
-				self.comment_text['state'] = "disabled"
-		else:
-			messagebox.showwarning("","Please select the kit !")
+			# ~ os.remove(programs_quantitative_path + self.experiment_name_text.get("1.0","end-1c") + '.xlsx')
+			# ~ self.load_program()
+			# ~ self.experiment_name_text['state'] = "normal"
+			# ~ self.properties_text['state'] = "normal"
+			# ~ self.experiment_name_text.delete('1.0',END)
+			# ~ self.comment_text.delete('1.0',END)
+			# ~ self.experiment_name_text['state'] = "disabled"
+			# ~ self.properties_text['state'] = "disabled"
+		# ~ else:
+			# ~ messagebox.showwarning("","Please select the kit !")
 
 	def new_clicked(self):
 		self.base_window.new_quantitative_1.experiment_name_entry.delete(0,END)
-		self.base_window.new_quantitative_1.user_name_entry.delete(0,END)
-		self.base_window.new_quantitative_1.comments_text.delete('1.0',END)
-
-		self.base_window.forget_page()
-		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.new_quantitative_1)
-		self.base_window.switch_page()
+		self.base_window.new_quantitative_1.properties_text.delete('1.0',END)
+		
+		# ~ create_kit_frame = Frame(self.work_frame,
+								 # ~ width = 200,
+								 # ~ height = 300,
+								 # ~ bg = 'grey80')
+		# ~ create_kit_frame.place(x=400, y=30)
+		try: 
+			self.info_labelframe.grid_forget()
+		except: 
+			pass
+			
+		self.create_kit_labelframe = LabelFrame(self.work_frame,
+								text = "New kit",
+								font = LABELFRAME_TXT_FONT,
+								bg = MAIN_FUNCTION_FRAME_BGD_COLOR)
+		self.create_kit_labelframe.grid(row=0, column=1, rowspan=3, ipadx=10, ipady=5, padx=10, pady=28)
+		# ~ self.base_window.forget_page()
+		# ~ self.base_window.page_num = self.base_window.frame_list.index(self.base_window.new_quantitative_1)
+		# ~ self.base_window.switch_page()
 
 	def back_clicked(self):
 		self.base_window.forget_page()
 		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_option)
 		self.base_window.switch_page()
+		
+	def load_program(self):
+		try:
+			for i in range(len(self.program_button)):
+				self.program_button[i].destroy()
+		except:
+			pass
+		self.program_button = list(range(100))
+		for file in os.listdir(programs_quantitative_path):
+			self.program_button[os.listdir(programs_qualitative_path).index(file)] = Button(self.program_frame.scrollable_frame,
+									text=file[:(len(file)-5)],
+									font = PROGRAM_BUTTON_TXT_FONT,
+									bg = PROGRAM_BUTTON_BGD_COLOR,
+									fg = PROGRAM_BUTTON_TXT_COLOR,
+									width = 51,
+									borderwidth = 0)
+			self.program_button[os.listdir(programs_qualitative_path).index(file)]['command'] = partial(self.program_clicked, os.listdir(programs_qualitative_path).index(file))
+			self.program_button[os.listdir(programs_qualitative_path).index(file)].pack(pady=2, ipady=5, fill=BOTH, expand=TRUE)
 
 
 class QualitativeOptionFrame(Frame):
@@ -7284,7 +7815,7 @@ class QualitativeOptionFrame(Frame):
 
 		# In work frame
 		self.calibration_button = Button(self.work_frame,
-									text = "Calibration",
+									text = "Create kit",
 									font = MAIN_FUCNTION_BUTTON_FONT,
 									bg = MAIN_FUNCTION_BUTTON_BGD_COLOR,
 									fg = MAIN_FUNCTION_BUTTON_TXT_COLOR,
@@ -7584,8 +8115,8 @@ class MainMenu(Frame):
 		self.title_label.pack(expand=TRUE)
 
 		self.screening_button = Button(self.work_frame,
-									#text = "SCREENING MODE",
-									text = "ANALYSIS",
+									text = "SCREENING MODE",
+									# ~ text = "ANALYSIS",
 									font = MAIN_MENU_BUTTON_FONT,
 									width = MAIN_MENU_BUTTON_WIDTH,
 									height = MAIN_MENU_BUTTON_HEIGHT,
@@ -7604,7 +8135,7 @@ class MainMenu(Frame):
 									fg = MAIN_MENU_BUTTON_TXT_COLOR,
 									borderwidth = 0,
 									command = self.quantitative_clicked)
-		#self.quantitative_button.grid(row=0, column=1, ipadx=20, ipady=10, padx=100, pady=130)
+		self.quantitative_button.grid(row=0, column=1, ipadx=20, ipady=10, padx=100, pady=130)
 
 		self.view_result_button = Button(self.button_frame,
 									text = "View Results",
@@ -7696,7 +8227,13 @@ class MainMenu(Frame):
 					fg = SWITCH_PAGE_BUTTON_TXT_COLOR,
 					borderwidth = 0,
 					command = self.cancel_clicked)
-		self.cancel_button.place(x=272,y=-19)
+		self.cancel_button.place(x=300,y=-19)
+		
+		self.quantitative_button['state'] = 'disabled'
+		self.view_result_button['state'] = 'disabled'
+		self.create_file_button['state'] = 'disabled'
+		self.connect_button['state'] = 'disabled'
+		
 	
 		# ~ self.base_window.forget_page()
 		# ~ #self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_option)
@@ -7749,6 +8286,11 @@ class MainMenu(Frame):
 			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_0)
 			self.base_window.switch_page()
 			
+		self.quantitative_button['state'] = 'normal'
+		self.view_result_button['state'] = 'normal'
+		self.create_file_button['state'] = 'normal'
+		self.connect_button['state'] = 'normal'
+			
 	def thr2_clicked(self):
 		self.threshold_label_frame.place_forget()
 		
@@ -7795,17 +8337,61 @@ class MainMenu(Frame):
 			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.qualitative_analysis_0)
 			self.base_window.switch_page()
 		
+		self.quantitative_button['state'] = 'normal'
+		self.view_result_button['state'] = 'normal'
+		self.create_file_button['state'] = 'normal'
+		self.connect_button['state'] = 'normal'
+		
 	def cancel_clicked(self):
 		try:
 			self.threshold_label_frame.place_forget()
 		except:
 			pass
+		
+		self.quantitative_button['state'] = 'normal'
+		self.view_result_button['state'] = 'normal'
+		self.create_file_button['state'] = 'normal'
+		self.connect_button['state'] = 'normal'
 	
 	
 	def quantitative_clicked(self):
-		self.base_window.forget_page()
-		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_option)
-		self.base_window.switch_page()
+		####### SYSTEM CHECK ########
+		global last_checkDate, last_checkMonth, last_checkYear, last_checkHour, last_checkMinute, last_checkSecond, last_checkValue
+		fr = open(working_dir + "/.system.txt","r")
+		last_checkDay = int(fr.readline())
+		last_checkMonth = int(fr.readline())
+		last_checkYear = int(fr.readline())
+		last_checkHour = int(fr.readline())
+		last_checkMinute = int(fr.readline())
+		last_checkSecond = int(fr.readline())
+		last_checkValue = float(fr.readline())
+		
+		now = datetime.now()
+		
+		time1 = last_checkYear*31536000 + last_checkMonth*2419200 + last_checkDay*86400 + last_checkHour*3600 + last_checkMinute*60 + last_checkSecond
+		time2 = now.year*31536000 + now.month*2419200 + now.day*86400 + now.hour*3600 + now.minute*60 + now.second  
+		number_of_hours = round(abs((time2 - time1)/3600),1)
+		
+		print("number_of_hours: ", number_of_hours)
+		
+		if(number_of_hours >= 1):
+			msg = messagebox.askquestion("","It's been a while since the last system check, would you like to check again ?")
+			if(msg == 'yes'):
+				self.base_window.system_check.mode_check = 2
+				self.base_window.forget_page()
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.system_check)
+				self.base_window.switch_page()
+				self.base_window.update_idletasks()
+				self.base_window.system_check.serial_handle()
+			else:
+				self.base_window.forget_page()
+				self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_0)
+				self.base_window.switch_page()
+		else:
+			self.base_window.forget_page()
+			self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_analysis_0)
+			self.base_window.switch_page()
+		
 
 	def view_result_clicked(self):
 		try:
@@ -8094,8 +8680,7 @@ class MainWindow(Tk):
 			self.update_idletasks()
 		else:
 			self.system_check_light()
-		
-	
+			 
 if __name__ == "__main__":
 	app = MainWindow()
 	app.mainloop()
