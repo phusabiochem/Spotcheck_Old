@@ -5759,7 +5759,7 @@ class QuantitativeAnalysisFrame0(QualitativeAnalysisFrame0):
 
 	def back_clicked(self):
 		self.base_window.forget_page()
-		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.main_menu)
+		self.base_window.page_num = self.base_window.frame_list.index(self.base_window.quantitative_option)
 		self.base_window.switch_page()
 
 	def next_clicked(self):
